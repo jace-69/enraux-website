@@ -17,7 +17,9 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-    <link rel="icon" href="https://framerusercontent.com/images/PdLHcrfPBfck5i4cWv5riPfoYM.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" />
     <link rel="stylesheet" href={cssFile} />
 
     <style is:global>
@@ -529,6 +531,28 @@ const {
       .__framer-badge {
         display: none !important;
       }
+
+      /* 4. Footer Phone Number Layout & (WhatsApp) Line */
+      .framer-gUICt .framer-y16uf {
+        overflow: visible !important;
+      }
+      .framer-gUICt .framer-15k7w5t a::after {
+        content: "(WhatsApp)";
+        display: block;
+        font-size: 13px;
+        line-height: 1.35;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.64);
+        margin-top: 2px;
+        text-decoration: none;
+      }
+
+      /* 5. Pricing Card CTA Button Cursor Fix */
+      .framer-KtiaD .framer-yicckt-container,
+      .framer-KtiaD .framer-upW4V,
+      .framer-KtiaD .framer-l6xzuo {
+        cursor: pointer !important;
+      }
     </style>
 
     <!-- Block Framer Editorbar Module Loading via Import Map -->
@@ -590,8 +614,22 @@ const {
         const editorbarSelector =
           "#__framer-editorbar, #__framer-editorbar-container, #__framer-editorbar-button, [id*='framer-editorbar'], [class*='framer-editorbar'], iframe[src*='framer.com/edit'], iframe[src*='editorbar']";
 
+        function purgeFramerIcons() {
+          try {
+            const icons = document.querySelectorAll('link[rel*="icon"]');
+            for (let i = 0; i < icons.length; i++) {
+              const el = icons[i];
+              const href = el.getAttribute("href") || "";
+              if (href.includes("framerusercontent.com")) {
+                el.remove();
+              }
+            }
+          } catch (e) {}
+        }
+
         function purgeEditorBar() {
           purgeStorage();
+          purgeFramerIcons();
           const elements = document.querySelectorAll(editorbarSelector);
           for (let i = 0; i < elements.length; i++) {
             elements[i].remove();
@@ -599,6 +637,7 @@ const {
         }
 
         const editorbarObserver = new MutationObserver((mutations) => {
+          purgeFramerIcons();
           for (let i = 0; i < mutations.length; i++) {
             const added = mutations[i].addedNodes;
             for (let j = 0; j < added.length; j++) {
@@ -608,6 +647,7 @@ const {
                 const className = typeof node.className === "string" ? node.className : "";
                 const src = node.getAttribute ? (node.getAttribute("src") || "") : "";
                 if (
+                  (node.tagName === "LINK" && (node.getAttribute("rel") || "").includes("icon") && (node.getAttribute("href") || "").includes("framerusercontent.com")) ||
                   id.includes("framer-editorbar") ||
                   className.includes("framer-editorbar") ||
                   node.matches?.(editorbarSelector) ||
@@ -618,6 +658,12 @@ const {
                   const nested = node.querySelectorAll(editorbarSelector);
                   for (let k = 0; k < nested.length; k++) {
                     nested[k].remove();
+                  }
+                  const nestedIcons = node.querySelectorAll('link[rel*="icon"]');
+                  for (let k = 0; k < nestedIcons.length; k++) {
+                    if ((nestedIcons[k].getAttribute("href") || "").includes("framerusercontent.com")) {
+                      nestedIcons[k].remove();
+                    }
                   }
                 }
               }
@@ -782,11 +828,72 @@ const {
         // Expose globally for DOM normalizer and external scripts
         window.__toCleanRootPath = toCleanRootPath;
 
+        // Fix 3A: Outgoing link helper & hydration guard mapping CTA text to ?service=<slug>
+        function getContactServiceTarget(a) {
+          if (!a) return null;
+          const rawHref = a.getAttribute("href") || "";
+          const clean = toCleanRootPath(rawHref);
+          if (!clean || (!clean.startsWith("/contact") && !clean.includes("/contact"))) {
+            return null;
+          }
+          const text = (a.textContent || "").replace(/\s+/g, " ").trim();
+          if (text.includes("Book Genesis Call")) {
+            return "/contact?service=genesis";
+          }
+          if (text.includes("Claim $200 Start Slot") || text.includes("Start for $200")) {
+            return "/contact?service=ad-trial";
+          }
+          if (text.includes("Scope Your Page")) {
+            return "/contact?service=landing-page";
+          }
+          if (text.includes("Book Scope Call")) {
+            return "/contact?service=ecommerce";
+          }
+          return null;
+        }
+        window.__getContactServiceTarget = getContactServiceTarget;
+
+        // Fix 3B: Pricing card CTA target helper mapping card button text to ?service=<slug>
+        function getPricingCardTarget(el) {
+          if (!el || typeof el.closest !== "function") return null;
+          const container = el.closest(".framer-KtiaD .framer-yicckt-container, .framer-KtiaD .framer-upW4V");
+          if (!container) return null;
+          const text = (container.textContent || "").replace(/\s+/g, " ").trim();
+          if (text.includes("Scope Your Page")) {
+            return "/contact?service=landing-page";
+          }
+          if (text.includes("Start for $200 Down")) {
+            return "/contact?service=ad-trial";
+          }
+          if (text.includes("Book 15-Min Scope Call")) {
+            return "/contact?service=genesis";
+          }
+          return null;
+        }
+        window.__getPricingCardTarget = getPricingCardTarget;
+
+        function setPricingButtonsRole() {
+          const buttons = document.querySelectorAll(
+            ".framer-KtiaD .framer-yicckt-container .framer-l6xzuo"
+          );
+          for (let i = 0; i < buttons.length; i++) {
+            const btn = buttons[i];
+            if (!btn.hasAttribute("role")) {
+              btn.setAttribute("role", "link");
+            }
+          }
+        }
+        window.__setPricingButtonsRole = setPricingButtonsRole;
+        setPricingButtonsRole();
+        document.addEventListener("DOMContentLoaded", setPricingButtonsRole);
+        window.addEventListener("load", setPricingButtonsRole);
+
         // Prefetch internal links on pointerover/mouseenter and touchstart (<link rel="prefetch" href="...">)
         const prefetchedUrls = new Set();
-        function prefetchTarget(rawHref) {
-          if (!rawHref) return;
-          const clean = toCleanRootPath(rawHref);
+        function prefetchTarget(rawHref, a) {
+          if (!rawHref && !a) return;
+          const serviceTarget = a ? getContactServiceTarget(a) : null;
+          const clean = serviceTarget || (rawHref && rawHref.startsWith("/") ? rawHref : toCleanRootPath(rawHref));
           if (
             !clean ||
             !clean.startsWith("/") ||
@@ -813,8 +920,13 @@ const {
         document.addEventListener(
           "pointerover",
           (e) => {
-            const a = e.target.closest("a");
-            if (a) prefetchTarget(a.getAttribute("href"));
+            const a = e.target.closest && e.target.closest("a");
+            if (a) {
+              prefetchTarget(a.getAttribute("href"), a);
+              return;
+            }
+            const pricingTarget = getPricingCardTarget(e.target);
+            if (pricingTarget) prefetchTarget(pricingTarget);
           },
           { passive: true }
         );
@@ -822,14 +934,79 @@ const {
         document.addEventListener(
           "touchstart",
           (e) => {
-            const a = e.target.closest("a");
-            if (a) prefetchTarget(a.getAttribute("href"));
+            const a = e.target.closest && e.target.closest("a");
+            if (a) {
+              prefetchTarget(a.getAttribute("href"), a);
+              return;
+            }
+            const pricingTarget = getPricingCardTarget(e.target);
+            if (pricingTarget) prefetchTarget(pricingTarget);
           },
           { passive: true }
         );
 
         // Immediate navigation for simultaneous native view transitions (0ms delay)
         let isNavigating = false;
+
+        // Pricing Card CTA Button Interceptor (synchronous Click #1 capture phase)
+        window.addEventListener(
+          "click",
+          (e) => {
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            if (e.target && e.target.closest && e.target.closest("a")) return;
+
+            const pricingTarget = getPricingCardTarget(e.target);
+            if (!pricingTarget) return;
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+
+            if (isNavigating) return;
+            isNavigating = true;
+            setTimeout(() => {
+              isNavigating = false;
+            }, 1200);
+
+            const targetUrl = window.location.origin + pricingTarget;
+            try {
+              window.location.href = targetUrl;
+            } catch {
+              isNavigating = false;
+            }
+          },
+          true
+        );
+
+        // Pricing Card CTA Keyboard Interceptor (Enter / Space)
+        window.addEventListener(
+          "keydown",
+          (e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            if (!e.target || !e.target.closest || e.target.closest("a")) return;
+
+            const pricingTarget = getPricingCardTarget(e.target);
+            if (!pricingTarget) return;
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+
+            if (isNavigating) return;
+            isNavigating = true;
+            setTimeout(() => {
+              isNavigating = false;
+            }, 1200);
+
+            const targetUrl = window.location.origin + pricingTarget;
+            try {
+              window.location.href = targetUrl;
+            } catch {
+              isNavigating = false;
+            }
+          },
+          true
+        );
 
         document.addEventListener(
           "click",
@@ -863,7 +1040,8 @@ const {
               return;
             }
 
-            const cleanRoute = toCleanRootPath(rawHref);
+            const serviceTarget = getContactServiceTarget(a);
+            const cleanRoute = serviceTarget || toCleanRootPath(rawHref);
             let targetUrl = null;
 
             if (cleanRoute && cleanRoute.startsWith("/")) {
@@ -918,10 +1096,24 @@ const {
   <body class={bodyClass}>
     <slot />
 
-    <!-- Footer 'Work' Removal System -->
+    <!-- Footer 'Work' Removal System & Pill Hydration Guards -->
     <script is:inline>
       (() => {
+        function hide3DProductRendersPills() {
+          document.querySelectorAll("p, span, div").forEach((el) => {
+            if (el.children.length === 0 && (el.textContent || "").trim() === "3D Product Renders") {
+              const pill = el.closest(".framer-h8ujbw-container") || el.closest(".framer-HrRNs") || el.parentElement;
+              if (pill && pill.style.display !== "none") {
+                pill.style.setProperty("display", "none", "important");
+              }
+              el.textContent = "";
+            }
+          });
+        }
+        window.__hide3DProductRendersPills = hide3DProductRendersPills;
+
         function removeWorkAndCollapseGap() {
+          hide3DProductRendersPills();
           document.querySelectorAll("a, p, span").forEach((el) => {
             const isWorkText = el.children.length === 0 && (el.textContent || "").trim() === "Work";
             const isWorkHref = el.tagName === "A" && /\/work$/i.test(el.getAttribute("href") || "");
@@ -1927,8 +2119,108 @@ const {
           "Custom Enterprise"
         ];
 
+        // Fix 3B: Query param to Service & Budget Pill mapping
+        const SERVICE_PARAM_MAP = {
+          "genesis": {
+            service: "$7k+ Brand Genesis",
+            pill: "$7k+ Brand Genesis"
+          },
+          "ad-trial": {
+            service: "$200 Ad Creative Trial",
+            pill: "$200 Ad Trial"
+          },
+          "landing-page": {
+            service: "High-Converting Landing Page (From $900)",
+            pill: "From $900 Landing Page"
+          },
+          "ecommerce": {
+            service: "High-Scale E-Commerce ($7.5k+)",
+            pill: "$7.5k–$15k E-Com"
+          },
+          "retainer": {
+            service: "Creative & Growth Retainer ($3.5k/mo)",
+            pill: "$3.5k/mo Retainer"
+          },
+          "saas": {
+            service: "Custom SaaS / Mobile App ($5k+)",
+            pill: "Custom Enterprise"
+          }
+        };
+
+        let userInteractedWithService = false;
         let activeBudgetPillText = null;
         let isPillMutating = false;
+
+        function resetUserInteraction() {
+          userInteractedWithService = false;
+        }
+
+        window.addEventListener("pageshow", resetUserInteraction);
+        window.addEventListener("popstate", resetUserInteraction);
+        document.addEventListener("astro:page-load", resetUserInteraction);
+        document.addEventListener("astro:after-swap", resetUserInteraction);
+
+        // Listen for direct user changes on select[name="Service"]
+        document.addEventListener(
+          "change",
+          (e) => {
+            if (
+              e.target &&
+              e.target.name === "Service" &&
+              !e.target.classList.contains("enraux-country-select") &&
+              e.isTrusted
+            ) {
+              userInteractedWithService = true;
+            }
+          },
+          true
+        );
+
+        function applyServiceFromUrl() {
+          if (userInteractedWithService) return;
+          const params = new URLSearchParams(window.location.search);
+          const serviceKey = (params.get("service") || "").toLowerCase().trim();
+          if (!serviceKey || !SERVICE_PARAM_MAP[serviceKey]) return;
+
+          const target = SERVICE_PARAM_MAP[serviceKey];
+          const selects = document.querySelectorAll('select[name="Service"]');
+          if (selects.length === 0) return;
+
+          selects.forEach((select) => {
+            syncServiceOptions(select);
+            const nativeSelectSetter = Object.getOwnPropertyDescriptor(
+              window.HTMLSelectElement.prototype,
+              "value"
+            )?.set;
+            if (nativeSelectSetter) {
+              nativeSelectSetter.call(select, target.service);
+            } else {
+              select.value = target.service;
+            }
+            select.dispatchEvent(new Event("input", { bubbles: true }));
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+          });
+
+          // Activate matching Budget Pill
+          const pills = getAllBudgetPills();
+          let matchedPill = null;
+          pills.forEach((p) => {
+            const text = getPillCleanText(p);
+            const isMatch =
+              text.includes(target.pill) ||
+              (target.pill.includes("E-Com") && text.includes("E-Com"));
+            if (isMatch) {
+              matchedPill = p;
+              applyPillStyles(p, true);
+            } else {
+              applyPillStyles(p, false);
+            }
+          });
+
+          if (matchedPill) {
+            activeBudgetPillText = getPillCleanText(matchedPill);
+          }
+        }
 
         function getPillCleanText(el) {
           if (!el) return "";
@@ -2050,6 +2342,7 @@ const {
 
         function handlePillClick(pill) {
           if (!pill) return;
+          userInteractedWithService = true;
           const clickedText = getPillCleanText(pill);
           activeBudgetPillText = clickedText;
 
@@ -2115,6 +2408,7 @@ const {
 
         // Reset helper for submission handler
         window.__resetActiveBudgetPills = function () {
+          userInteractedWithService = false;
           activeBudgetPillText = null;
           const pills = getAllBudgetPills();
           for (let i = 0; i < pills.length; i++) {
@@ -2125,6 +2419,9 @@ const {
         // Hydration Guard via MutationObserver to preserve active selection if React re-renders
         function restoreSelectionState() {
           if (isPillMutating) return;
+          if (!userInteractedWithService) {
+            applyServiceFromUrl();
+          }
           if (!activeBudgetPillText) return;
           isPillMutating = true;
           try {
@@ -2147,6 +2444,9 @@ const {
         function initServiceSync() {
           const selects = document.querySelectorAll('select[name="Service"]');
           selects.forEach(syncServiceOptions);
+          if (!userInteractedWithService) {
+            applyServiceFromUrl();
+          }
         }
 
         if (document.readyState === "loading") {
@@ -2155,6 +2455,14 @@ const {
           initServiceSync();
         }
         document.addEventListener("astro:page-load", initServiceSync);
+
+        // Hydration window interval to preserve ?service= selection if React/Framer resets it
+        const urlSyncInterval = setInterval(() => {
+          if (!userInteractedWithService) {
+            applyServiceFromUrl();
+          }
+        }, 100);
+        setTimeout(() => clearInterval(urlSyncInterval), 4000);
 
         // Guard MutationObserver against infinite loops and input/textarea thrashing
         const pillObserver = new MutationObserver((mutations) => {
@@ -2480,6 +2788,9 @@ const {
 
         function replaceFormaStudioText() {
           try {
+            if (typeof window.__hide3DProductRendersPills === "function") {
+              window.__hide3DProductRendersPills();
+            }
             const root = document.body || document.documentElement;
             if (!root) return;
             const walker = document.createTreeWalker(
@@ -2506,6 +2817,34 @@ const {
               }
               if (node.nodeValue && /3D Identity/i.test(node.nodeValue)) {
                 node.nodeValue = node.nodeValue.replace(/3D Identity/gi, "Visual Identity");
+              }
+              if (node.nodeValue && /photorealistic\s+3D\s+product\s+visuals/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/photorealistic\s+3D\s+product\s+visuals/gi, "photorealistic product visuals");
+              }
+              if (node.nodeValue && /photorealistic\s+3D\s+product\s+renders/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/photorealistic\s+3D\s+product\s+renders/gi, "photorealistic product visuals");
+              }
+              if (node.nodeValue && /studio-grade\s+3D\s+product\s+visuals/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/studio-grade\s+3D\s+product\s+visuals/gi, "studio-grade product visuals");
+              }
+              if (node.nodeValue && /brand\s+identity\s*&\s*3D\s+visuals/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/brand\s+identity\s*&\s*3D\s+visuals/gi, "brand identity & product visuals");
+              }
+              if (node.nodeValue && /Full\s+Identity\s*\+\s*3D\s+Product\s+Vis/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/Full\s+Identity\s*\+\s*3D\s+Product\s+Vis/gi, "Full Identity + Product Visuals");
+              }
+              if (node.nodeValue && /Photorealistic\s+3D\s+Product\s+Visualization/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/Photorealistic\s+3D\s+Product\s+Visualization/gi, "Photorealistic Product Visualization");
+              }
+              if (node.nodeValue && (node.nodeValue.trim() === "3D Product Renders" || /3D Product Renders/i.test(node.nodeValue))) {
+                const el = node.parentElement;
+                if (el) {
+                  const pill = el.closest(".framer-h8ujbw-container") || el.closest(".framer-HrRNs") || el;
+                  if (pill && pill.style.display !== "none") {
+                    pill.style.setProperty("display", "none", "important");
+                  }
+                }
+                node.nodeValue = "";
               }
               if (node.nodeValue && /\$20,000\s*Flat/i.test(node.nodeValue)) {
                 node.nodeValue = node.nodeValue.replace(/\$20,000\s*Flat/gi, "$7k+");
@@ -2537,6 +2876,15 @@ const {
               return;
             }
 
+            // Fix 3A: Outgoing link & hydration guard for CTA buttons pointing to /contact
+            const serviceTarget = typeof window.__getContactServiceTarget === "function" ? window.__getContactServiceTarget(a) : null;
+            if (serviceTarget) {
+              if (a.getAttribute("href") !== serviceTarget) {
+                a.setAttribute("href", serviceTarget);
+              }
+              return;
+            }
+
             // Preserve external links, mailto, tel, anchors
             if (
               rawHref.startsWith("#") ||
@@ -2565,6 +2913,16 @@ const {
 
           // Guard light-header location text color against Framer hydration
           guardLocationTextColor();
+
+          // Purge any re-injected Framer CDN favicons
+          try {
+            document.querySelectorAll('link[rel*="icon"]').forEach((link) => {
+              const href = link.getAttribute("href") || "";
+              if (href.includes("framerusercontent.com")) {
+                link.remove();
+              }
+            });
+          } catch (e) {}
         }
 
         function normalizeLinkElement(target) {
@@ -2575,6 +2933,15 @@ const {
 
           // Runtime guard for placeholder mailto and tel links re-hydrated by Framer
           if (guardContactLink(a, rawHref)) {
+            return;
+          }
+
+          // Fix 3A: Outgoing link & hydration guard for CTA buttons pointing to /contact
+          const serviceTarget = typeof window.__getContactServiceTarget === "function" ? window.__getContactServiceTarget(a) : null;
+          if (serviceTarget) {
+            if (a.getAttribute("href") !== serviceTarget) {
+              a.setAttribute("href", serviceTarget);
+            }
             return;
           }
 
@@ -2898,14 +3265,22 @@ const {
           const drawer = document.createElement("div");
           drawer.id = "enraux-static-menu-drawer";
           drawer.setAttribute("aria-hidden", "true");
-          const isBlogPage = window.location.pathname.startsWith("/blog");
+          const normPath = window.location.pathname.replace(/\/+$/, "") || "/";
+          const isHome = normPath === "/";
+          const isAbout = normPath === "/about";
+          const isService = normPath === "/service";
+          const isPricing = normPath === "/pricing";
+          const isBlog = normPath.startsWith("/blog");
+          const isContact = normPath === "/contact";
+
           drawer.innerHTML = [
             '<div class="enraux-drawer-nav" role="navigation" aria-label="Menu Navigation">',
-            '  <a class="enraux-drawer-link" href="/">Home</a>',
-            '  <a class="enraux-drawer-link" href="/about">About</a>',
-            '  <a class="enraux-drawer-link" href="/service">Service</a>',
-            '  <a class="enraux-drawer-link' + (isBlogPage ? ' is-active' : '') + '" href="/blog">Blog</a>',
-            '  <a class="enraux-drawer-link" href="/contact">Contact</a>',
+            '  <a class="enraux-drawer-link' + (isHome ? ' is-active' : '') + '" href="/">Home</a>',
+            '  <a class="enraux-drawer-link' + (isAbout ? ' is-active' : '') + '" href="/about">About</a>',
+            '  <a class="enraux-drawer-link' + (isService ? ' is-active' : '') + '" href="/service">Service</a>',
+            '  <a class="enraux-drawer-link' + (isPricing ? ' is-active' : '') + '" href="/pricing">Pricing</a>',
+            '  <a class="enraux-drawer-link' + (isBlog ? ' is-active' : '') + '" href="/blog">Blog</a>',
+            '  <a class="enraux-drawer-link' + (isContact ? ' is-active' : '') + '" href="/contact">Contact</a>',
             '</div>',
             '<div class="enraux-drawer-footer">',
             '  <div class="enraux-drawer-footer-inner">',
@@ -2977,6 +3352,186 @@ const {
         } else {
           initStaticMenuDrawer();
         }
+      })();
+    </script>
+
+    <!-- Hydrated Framer Menu Drawer: Inject Pricing Link (/pricing) -->
+    <script is:inline>
+      (() => {
+        function injectPricingMenuLink() {
+          const lists = document.querySelectorAll(
+            ".framer-17nx4mu-container .framer-1axf9e6, .framer-hksrw .framer-1axf9e6"
+          );
+          if (!lists || lists.length === 0) return;
+
+          lists.forEach((list) => {
+            if (list.querySelector('[data-enraux-pricing-nav="true"]')) return;
+            const existingPricingLink = Array.from(list.querySelectorAll("a")).some((a) => {
+              const h = a.getAttribute("href") || "";
+              const clean = typeof window.__toCleanRootPath === "function" ? window.__toCleanRootPath(h) : h;
+              return clean === "/pricing" || clean.endsWith("/pricing");
+            });
+            if (existingPricingLink) return;
+
+            const directChildren = Array.from(list.children);
+            let serviceItem = null;
+            let cleanTemplateItem = null;
+            let fallbackTemplateItem = null;
+
+            for (const child of directChildren) {
+              const anchor = child.querySelector("a") || (child.tagName === "A" ? child : null);
+              if (!anchor) continue;
+              const rawHref = anchor.getAttribute("href") || "";
+              const cleanPath = typeof window.__toCleanRootPath === "function"
+                ? window.__toCleanRootPath(rawHref)
+                : rawHref.replace(/^(?:https?:\/\/[^\/]+)?/, "").split("?")[0].replace(/\/+$/, "") || "/";
+
+              if (cleanPath === "/service" || cleanPath.endsWith("/service")) {
+                serviceItem = child;
+              }
+
+              const isWork = cleanPath === "/work" || cleanPath.endsWith("/work");
+              const isCurrent = anchor.getAttribute("data-framer-page-link-current") === "true";
+              if (!isWork && !isCurrent && !cleanTemplateItem) {
+                cleanTemplateItem = child;
+              }
+              if (!isWork && !fallbackTemplateItem) {
+                fallbackTemplateItem = child;
+              }
+            }
+
+            if (!serviceItem) return;
+
+            const template = cleanTemplateItem || fallbackTemplateItem || serviceItem;
+            const pricingItem = template.cloneNode(true);
+            pricingItem.setAttribute("data-enraux-pricing-nav", "true");
+            pricingItem.style.removeProperty("display");
+            if (pricingItem.style.display === "none") {
+              pricingItem.style.display = "";
+            }
+
+            if (pricingItem.hasAttribute("data-framer-name")) {
+              pricingItem.setAttribute("data-framer-name", "Pricing");
+            }
+            pricingItem.querySelectorAll("[data-framer-name]").forEach((el) => {
+              const name = el.getAttribute("data-framer-name") || "";
+              if (/^(?:Home|About(?:\s*us)?|Service[s]?|Work|Blog|Contact)$/i.test(name.trim())) {
+                el.setAttribute("data-framer-name", "Pricing");
+              }
+            });
+
+            const pricingAnchor = pricingItem.querySelector("a") || (pricingItem.tagName === "A" ? pricingItem : null);
+            const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+            const isPricingPage = currentPath === "/pricing";
+
+            if (pricingAnchor) {
+              pricingAnchor.setAttribute("href", "/pricing");
+              if (isPricingPage) {
+                pricingAnchor.setAttribute("data-framer-page-link-current", "true");
+              } else {
+                pricingAnchor.removeAttribute("data-framer-page-link-current");
+              }
+            }
+
+            const walker = document.createTreeWalker(pricingItem, NodeFilter.SHOW_TEXT, null);
+            let textNode;
+            let replaced = false;
+            while ((textNode = walker.nextNode())) {
+              const val = (textNode.nodeValue || "").trim();
+              if (/^(?:Home|About(?:\s*us)?|Service[s]?|Work|Blog|Contact)$/i.test(val)) {
+                textNode.nodeValue = "Pricing";
+                replaced = true;
+              }
+            }
+            if (!replaced && pricingAnchor) {
+              const aWalker = document.createTreeWalker(pricingAnchor, NodeFilter.SHOW_TEXT, null);
+              let n;
+              while ((n = aWalker.nextNode())) {
+                if (n.nodeValue && n.nodeValue.trim().length > 0) {
+                  n.nodeValue = "Pricing";
+                  replaced = true;
+                  break;
+                }
+              }
+            }
+
+            if (serviceItem.nextSibling) {
+              list.insertBefore(pricingItem, serviceItem.nextSibling);
+            } else {
+              list.appendChild(pricingItem);
+            }
+          });
+        }
+
+        injectPricingMenuLink();
+        document.addEventListener("DOMContentLoaded", injectPricingMenuLink);
+        window.addEventListener("load", injectPricingMenuLink);
+
+        let pricingNavPending = false;
+        const pricingNavObserver = new MutationObserver(() => {
+          if (pricingNavPending) return;
+          pricingNavPending = true;
+          requestAnimationFrame(() => {
+            pricingNavPending = false;
+            injectPricingMenuLink();
+            if (typeof window.__setPricingButtonsRole === "function") {
+              window.__setPricingButtonsRole();
+            }
+          });
+        });
+        pricingNavObserver.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        window.addEventListener(
+          "click",
+          (e) => {
+            const trigger =
+              e.target &&
+              typeof e.target.closest === "function" &&
+              e.target.closest(".framer-r1ebey, .framer-qvIpE, .framer-1vfl530");
+            if (trigger) {
+              requestAnimationFrame(injectPricingMenuLink);
+              setTimeout(injectPricingMenuLink, 50);
+              setTimeout(injectPricingMenuLink, 150);
+              setTimeout(injectPricingMenuLink, 300);
+              setTimeout(injectPricingMenuLink, 600);
+            }
+          },
+          true
+        );
+      })();
+    </script>
+
+    <!-- Hero Appear Animation Safety Fallback (Edge WAAPI / dropped animation guard) -->
+    <script is:inline>
+      (function() {
+        function checkHeroAppearElements() {
+          const appearElements = document.querySelectorAll(
+            ".framer-208ybr [data-framer-appear-id], .framer-208ybr .framer-18b7vvs, .framer-208ybr .framer-21z1vs, .framer-208ybr .framer-16y13cd-container, .framer-208ybr .framer-wvinzv-container"
+          );
+          appearElements.forEach((el) => {
+            if (el.closest(".framer-1e663qr, .framer-qsj2t3, .framer-g5dzqe") || el.tagName === "SPAN") return;
+            const currentOpacity = parseFloat(window.getComputedStyle(el).opacity);
+            if (!isNaN(currentOpacity) && currentOpacity < 0.5) {
+              el.style.transition = "opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
+              el.style.opacity = "1";
+              el.style.transform = "translateY(0px)";
+            }
+          });
+        }
+
+        function scheduleHeroCheck() {
+          setTimeout(checkHeroAppearElements, 850);
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", scheduleHeroCheck);
+        } else {
+          scheduleHeroCheck();
+        }
+        window.addEventListener("load", scheduleHeroCheck);
       })();
     </script>
 
