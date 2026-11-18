@@ -2,9 +2,15 @@
   "name": "enraux-website",
   "main": "src/worker.js",
   "compatibility_date": "2026-11-17",
+  "keep_vars": true,
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "run_worker_first": ["/api/contact"]
+  },
+  "vars": {
+    "RESEND_FROM_EMAIL": "Enraux <hello@enraux.com>",
+    "RESEND_TO_EMAIL": "hello@enraux.com",
+    "RESEND_SEND_CONFIRMATION": "true"
   }
 }
