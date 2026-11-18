@@ -1,0 +1,2984 @@
+---
+interface Props {
+  title?: string;
+  cssFile?: string;
+  bodyClass?: string;
+}
+
+const {
+  title = "Enraux Studio",
+  cssFile = "/styles/index.css",
+  bodyClass = "",
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="icon" href="https://framerusercontent.com/images/PdLHcrfPBfck5i4cWv5riPfoYM.svg" />
+    <link rel="stylesheet" href={cssFile} />
+
+    <style is:global>
+      /* 1. Canvas Lock & Framer Stacked Scale-Back View Transition */
+      html {
+        background-color: #060606 !important;
+      }
+
+      @view-transition {
+        navigation: auto;
+      }
+
+      ::view-transition {
+        background-color: #060606;
+      }
+
+      ::view-transition-group(root) {
+        animation-duration: 0.52s;
+        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      ::view-transition-old(root) {
+        z-index: 1;
+        transform-origin: center top;
+        overflow: hidden;
+        mix-blend-mode: normal !important;
+        animation: framerStackExit 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      ::view-transition-new(root) {
+        z-index: 2;
+        transform-origin: center bottom;
+        overflow: hidden;
+        mix-blend-mode: normal !important;
+        animation: framerStackEnter 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      @keyframes framerStackExit {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translate3d(0, -3.5vh, 0) scale(0.94);
+          opacity: 0.25;
+        }
+      }
+
+      @keyframes framerStackEnter {
+        0% {
+          transform: translate3d(0, 100vh, 0);
+          opacity: 1;
+        }
+        100% {
+          transform: translate3d(0, 0, 0);
+          opacity: 1;
+        }
+      }
+
+      /* 2. Ancestors of the Navbar must NEVER have transforms applied (prevents position: fixed detachment) */
+      html,
+      body,
+      #main,
+      .framer-ZHkV9,
+      .framer-i4eIh,
+      [data-layout-template="true"] {
+        transform: none !important;
+        -webkit-transform: none !important;
+        filter: none !important;
+        perspective: none !important;
+      }
+
+      /* 2. Form Autofill & Browser Input Selection Overrides */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus,
+      input:-webkit-autofill:active,
+      textarea:-webkit-autofill,
+      textarea:-webkit-autofill:hover,
+      textarea:-webkit-autofill:focus,
+      textarea:-webkit-autofill:active,
+      select:-webkit-autofill,
+      select:-webkit-autofill:hover,
+      select:-webkit-autofill:focus,
+      select:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+        box-shadow: 0 0 0 1000px #ffffff inset !important;
+        -webkit-text-fill-color: #0a0a0a !important;
+        color: #0a0a0a !important;
+        caret-color: #0a0a0a !important;
+        transition: background-color 9999s ease-out 0s !important;
+      }
+
+      /* Form Input, Textarea & Select Base Color */
+      input,
+      textarea,
+      select,
+      .framer-form-input {
+        color: #0a0a0a !important;
+        caret-color: #0a0a0a !important;
+      }
+
+      input:not(:placeholder-shown),
+      textarea:not(:placeholder-shown),
+      input:focus,
+      textarea:focus,
+      select {
+        -webkit-text-fill-color: #0a0a0a !important;
+        color: #0a0a0a !important;
+      }
+
+      input::placeholder,
+      textarea::placeholder,
+      .framer-form-input::placeholder {
+        color: rgba(10, 10, 10, 0.45) !important;
+        -webkit-text-fill-color: rgba(10, 10, 10, 0.45) !important;
+        opacity: 1 !important;
+      }
+
+      /* Form Selection Styling */
+      input::selection,
+      input::-moz-selection,
+      textarea::selection,
+      textarea::-moz-selection,
+      select::selection,
+      select::-moz-selection,
+      .framer-form-input::selection,
+      .framer-form-input::-moz-selection,
+      form ::selection,
+      form ::-moz-selection {
+        background-color: rgba(10, 10, 10, 0.15) !important;
+        color: #0a0a0a !important;
+        -webkit-text-fill-color: #0a0a0a !important;
+      }
+
+      /* 3. Article Body Subheadings Left Alignment & Uniform Scale Guarantee */
+      .framer-1e374s0 h5,
+      .framer-1e374s0 h2,
+      .framer-46ixfy h5,
+      .framer-46ixfy h2,
+      .framer-n8vu8z h5,
+      .framer-n8vu8z h2 {
+        font-family: var(--framer-font-family, "Neue Montreal Medium", sans-serif) !important;
+        font-size: 36px !important;
+        font-weight: 500 !important;
+        line-height: 1.125em !important;
+        letter-spacing: 0em !important;
+        text-align: left !important;
+        --framer-text-alignment: start !important;
+      }
+      @media (min-width: 810px) and (max-width: 1439.98px) {
+        .framer-1e374s0 h5, .framer-1e374s0 h2,
+        .framer-46ixfy h5, .framer-46ixfy h2,
+        .framer-n8vu8z h5, .framer-n8vu8z h2 {
+          font-size: 27px !important;
+        }
+      }
+      @media (max-width: 809.98px) {
+        .framer-1e374s0 h5, .framer-1e374s0 h2,
+        .framer-46ixfy h5, .framer-46ixfy h2,
+        .framer-n8vu8z h5, .framer-n8vu8z h2 {
+          font-size: 24px !important;
+        }
+      }
+      /* Fix pretty-printed newline + <br> double-spacing and missing top margin on first heading of .framer-n8vu8z across all 8 blog articles */
+      .framer-1e374s0 .framer-46ixfy,
+      .framer-1e374s0 .framer-n8vu8z {
+        white-space: normal !important;
+      }
+      .framer-1e374s0 .framer-n8vu8z h5:first-child,
+      .framer-1e374s0 .framer-n8vu8z h2:first-child {
+        margin-top: 40px !important;
+      }
+
+      /* 4. Framer Editorbar Complete Removal */
+      #__framer-editorbar,
+      #__framer-editorbar-container,
+      #__framer-editorbar-button,
+      [id*='framer-editorbar'],
+      [class*='framer-editorbar'],
+      iframe[src*='framer.com/edit'],
+      iframe[src*='editorbar'] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+        z-index: -9999 !important;
+      }
+
+      /* 5. Prevent pretty-printed HTML newlines/spaces inside Framer navbar RichText containers from expanding white-space: pre/pre-wrap into 95px ghost lines */
+      nav.framer-z10Ts .framer-nw6mze,
+      nav.framer-z10Ts .framer-da95kg,
+      nav.framer-z10Ts .framer-wvhydi,
+      nav.framer-z10Ts .framer-k0x150,
+      nav.framer-z10Ts .framer-1hvascq {
+        white-space: nowrap !important;
+      }
+      nav.framer-z10Ts .framer-10chgwv {
+        white-space: normal !important;
+      }
+
+      /* Prevent pretty-printed HTML newlines/spaces from expanding white-space: pre in Footer & Blog link/button components (especially unhydrated Blogs #2-#8) */
+      .framer-gUICt .framer-18255hk [data-framer-component-type="RichTextContainer"],
+      .framer-gUICt .framer-7exzhq,
+      .framer-gUICt .framer-zfvdnq,
+      .framer-gUICt .framer-1w8crey,
+      .framer-gUICt .framer-9qg7n9,
+      .framer-gUICt .framer-cfevr7,
+      .framer-gUICt .framer-xjk71,
+      .framer-gUICt .framer-1ibtwga,
+      .framer-gUICt .framer-1cq1jn1,
+      .framer-gUICt .framer-e74mop,
+      .framer-gUICt .framer-1woln0z,
+      .framer-gUICt .framer-cqvuk3,
+      .framer-gUICt .framer-17b79cl,
+      .framer-gUICt .framer-2lslxg,
+      .framer-gUICt .framer-1v3fnso,
+      .framer-gUICt .framer-koi1nl,
+      .framer-gUICt .framer-15k7w5t,
+      .framer-gUICt .framer-51x1x9,
+      .framer-gUICt .framer-468j90,
+      .framer-gUICt .framer-1o6jzmf,
+      .framer-gUICt .framer-djkety,
+      .framer-gUICt .framer-xubrmh,
+      .framer-gUICt .framer-u3ylk6,
+      .framer-gUICt .framer-1ftcss9,
+      .framer-gUICt .framer-vmdjkj,
+      .framer-TJio6 .framer-16j2efq,
+      .framer-jby5y .framer-15o3nqe,
+      .framer-jby5y .framer-1nndp6r,
+      .framer-jby5y .framer-1hepzt8,
+      .framer-jby5y .framer-199jy99,
+      .framer-jby5y .framer-1sisjzd,
+      .framer-jby5y .framer-9kjxqx,
+      .framer-jby5y .framer-c5274b,
+      .framer-jby5y .framer-1e1c26e,
+      .framer-jby5y .framer-1fkcte0,
+      .framer-wrcOp .framer-1e635t7,
+      .framer-rhiQ5 .framer-19qyw7o,
+      .framer-PyJCR .framer-ori6dw,
+      .framer-PyJCR .framer-wq8r24,
+      .framer-PyJCR .framer-1du0gh2 {
+        white-space: nowrap !important;
+      }
+
+      /* Prevent pretty-printed HTML newlines/spaces from expanding white-space: pre in Hero Service Tags bar */
+      .framer-21z1vs [data-framer-component-type="RichTextContainer"],
+      .framer-jWZoB .framer-7xo6i5,
+      .framer-jWZoB .framer-t8enk1,
+      .framer-jWZoB .framer-1j81ief,
+      .framer-jWZoB .framer-r52ssz,
+      .framer-jWZoB .framer-17i8qxy {
+        white-space: nowrap !important;
+      }
+
+      /* 6. Hide Redundant Project Budget Section in Contact Form & Location Block */
+      form.framer-4i9xwl .framer-48sj51,
+      form[data-framer-form] [data-framer-name="Tag"] {
+        display: none !important;
+      }
+      .framer-aphij7[data-framer-name="Location"], .framer-hd91nv[data-framer-name="Location"] { display: none !important; }
+
+      /* 7. Fallback Menu Drawer for Static Blog Articles (#2-#8 where Framer script_main is absent) */
+      html.enraux-static-menu-open,
+      body.enraux-static-menu-open {
+        overflow: hidden !important;
+      }
+      body.enraux-static-menu-open .framer-ZHkV9 {
+        z-index: auto !important;
+        isolation: auto !important;
+      }
+      body.enraux-static-menu-open .framer-1kmos2s-container {
+        z-index: 99999 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+      }
+      .framer-qvIpE.enraux-icon-open .framer-dz4byv {
+        z-index: 1;
+        position: absolute !important;
+        top: calc(50% - 1px) !important;
+        left: calc(50% - 9px) !important;
+        transform: rotate(45deg) !important;
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .framer-qvIpE.enraux-icon-open .framer-15dkvrp {
+        z-index: 1;
+        position: absolute !important;
+        top: calc(50% - 1px) !important;
+        left: calc(50% - 9px) !important;
+        transform: rotate(-45deg) !important;
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .framer-qvIpE.enraux-icon-open .framer-1uq5uon {
+        opacity: 0 !important;
+        transition: opacity 0.2s ease;
+      }
+      .framer-qvIpE .framer-dz4byv,
+      .framer-qvIpE .framer-15dkvrp,
+      .framer-qvIpE .framer-1uq5uon {
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+      }
+      #enraux-static-menu-drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 99990;
+        background-color: #ffffff;
+        color: #0d0d0d;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding-top: 104px;
+        overflow-y: auto;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translate3d(0, -100%, 0);
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                    opacity 0.28s ease,
+                    visibility 0.45s;
+      }
+      #enraux-static-menu-drawer.is-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+      }
+      #enraux-static-menu-drawer .enraux-drawer-nav {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        padding: 32px 20px;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-link {
+        font-family: "Neue Montreal Medium", "Neue Montreal Regular", sans-serif;
+        font-size: clamp(34px, 3.6vw, 52px);
+        font-weight: 500;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        color: #0d0d0d;
+        text-decoration: none;
+        text-align: center;
+        transition: opacity 0.2s ease;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-link:hover {
+        opacity: 0.6;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-link.is-active {
+        text-decoration: underline;
+        text-underline-offset: 6px;
+        text-decoration-thickness: 3px;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-footer {
+        background-color: #f3f3f3;
+        width: 100%;
+        padding: 24px 32px;
+        flex: none;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-footer-inner {
+        max-width: 1376px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-family: "Neue Montreal Regular", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #0d0d0d;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-legal {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-legal a {
+        color: #0d0d0d;
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+      }
+      #enraux-static-menu-drawer .enraux-drawer-legal a:hover {
+        opacity: 0.6;
+        text-decoration: underline;
+      }
+      @media (max-width: 809.98px) {
+        #enraux-static-menu-drawer {
+          padding-top: 72px;
+        }
+        #enraux-static-menu-drawer .enraux-drawer-nav {
+          gap: 16px;
+        }
+        #enraux-static-menu-drawer .enraux-drawer-link {
+          font-size: 36px;
+        }
+        #enraux-static-menu-drawer .enraux-drawer-footer {
+          padding: 20px;
+        }
+        #enraux-static-menu-drawer .enraux-drawer-footer-inner {
+          flex-direction: column;
+          justify-content: center;
+          text-align: center;
+          gap: 8px;
+        }
+      }
+
+      /* Unified Country Code + WhatsApp Input Combo */
+      .enraux-phone-combo {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        background: var(--framer-input-background, #ffffff) !important;
+        border-radius: 4px !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        transition: box-shadow 0.15s ease !important;
+        padding: 0 !important;
+      }
+
+      .enraux-phone-combo:focus-within {
+        box-shadow: inset 0 0 0 1px #0d0d0d !important;
+      }
+
+      .enraux-phone-combo .enraux-country-wrap {
+        position: relative !important;
+        flex: 0 0 43% !important;
+        min-width: 122px !important;
+        max-width: 190px !important;
+        border-right: 1px solid rgba(13, 13, 13, 0.14) !important;
+        display: flex !important;
+        align-items: center !important;
+        background: transparent !important;
+        transition: background-color 0.2s ease !important;
+      }
+
+      .enraux-phone-combo .enraux-country-wrap.enraux-country-nudge {
+        background-color: rgba(13, 13, 13, 0.08) !important;
+      }
+
+      .enraux-phone-combo .enraux-country-wrap::after {
+        content: "" !important;
+        position: absolute !important;
+        right: 10px !important;
+        top: 50% !important;
+        width: 14px !important;
+        height: 14px !important;
+        transform: translateY(-50%) !important;
+        pointer-events: none !important;
+        background-color: #0d0d0d !important;
+        -webkit-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M 3.5 6 L 8 10.5 L 12.5 6' fill='transparent' stroke-width='1.5' stroke='rgb(13,13,13)' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 14px no-repeat !important;
+        mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M 3.5 6 L 8 10.5 L 12.5 6' fill='transparent' stroke-width='1.5' stroke='rgb(13,13,13)' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 14px no-repeat !important;
+      }
+
+      .enraux-phone-combo select.enraux-country-select {
+        width: 100% !important;
+        height: 100% !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        color: #0d0d0d !important;
+        font-family: var(--framer-input-font-family, "Neue Montreal Regular", sans-serif) !important;
+        font-size: var(--framer-input-font-size, 16px) !important;
+        font-weight: 400 !important;
+        line-height: 1.25em !important;
+        padding: var(--framer-input-padding, 14px) 28px var(--framer-input-padding, 14px) var(--framer-input-padding, 14px) !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        cursor: pointer !important;
+      }
+
+      .enraux-phone-combo select.enraux-country-select:invalid {
+        color: rgba(13, 13, 13, 0.72) !important;
+      }
+
+      .enraux-phone-combo select.enraux-country-select option {
+        color: #0d0d0d !important;
+        background: #ffffff !important;
+      }
+
+      .enraux-phone-combo input[type="tel"].framer-form-input {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        width: auto !important;
+        padding: var(--framer-input-padding, 14px) !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        color: #0d0d0d !important;
+        -webkit-text-fill-color: #0d0d0d !important;
+      }
+
+      /* Framer Badge Hydration Fallback */
+      #__framer-badge-container,
+      .__framer-badge {
+        display: none !important;
+      }
+    </style>
+
+    <!-- Block Framer Editorbar Module Loading via Import Map -->
+    <script type="importmap">
+      {
+        "imports": {
+          "https://framer.com/edit/init.mjs": "data:text/javascript,export function createEditorBar(){ return () => null; }"
+        }
+      }
+    </script>
+
+    <!-- Framer Editorbar DOM Cleanup & Interceptor -->
+    <script is:inline>
+      (() => {
+        function purgeStorage() {
+          try {
+            localStorage.removeItem("__framer_force_showing_editorbar_since");
+            localStorage.removeItem("framer_editSite");
+            sessionStorage.removeItem("__framer_force_showing_editorbar_since");
+            sessionStorage.removeItem("framer_editSite");
+          } catch (e) {}
+        }
+        purgeStorage();
+
+        const origCreateElement = document.createElement.bind(document);
+        document.createElement = function (tagName, options) {
+          const el = origCreateElement(tagName, options);
+          const tag = (tagName || "").toLowerCase();
+          if (tag === "iframe") {
+            const origSetAttribute = el.setAttribute.bind(el);
+            el.setAttribute = function (name, value) {
+              const val = String(value || "");
+              if (
+                (name === "src" && (val.includes("framer.com/edit") || val.includes("editorbar"))) ||
+                (name === "id" && val.includes("framer-editorbar"))
+              ) {
+                return;
+              }
+              return origSetAttribute(name, value);
+            };
+            try {
+              Object.defineProperty(el, "src", {
+                set(val) {
+                  const s = String(val || "");
+                  if (s.includes("framer.com/edit") || s.includes("editorbar")) {
+                    return;
+                  }
+                  origSetAttribute("src", val);
+                },
+                get() {
+                  return el.getAttribute("src") || "";
+                },
+              });
+            } catch (e) {}
+          }
+          return el;
+        };
+
+        const editorbarSelector =
+          "#__framer-editorbar, #__framer-editorbar-container, #__framer-editorbar-button, [id*='framer-editorbar'], [class*='framer-editorbar'], iframe[src*='framer.com/edit'], iframe[src*='editorbar']";
+
+        function purgeEditorBar() {
+          purgeStorage();
+          const elements = document.querySelectorAll(editorbarSelector);
+          for (let i = 0; i < elements.length; i++) {
+            elements[i].remove();
+          }
+        }
+
+        const editorbarObserver = new MutationObserver((mutations) => {
+          for (let i = 0; i < mutations.length; i++) {
+            const added = mutations[i].addedNodes;
+            for (let j = 0; j < added.length; j++) {
+              const node = added[j];
+              if (node.nodeType === 1) {
+                const id = node.id || "";
+                const className = typeof node.className === "string" ? node.className : "";
+                const src = node.getAttribute ? (node.getAttribute("src") || "") : "";
+                if (
+                  id.includes("framer-editorbar") ||
+                  className.includes("framer-editorbar") ||
+                  node.matches?.(editorbarSelector) ||
+                  (node.tagName === "IFRAME" && (src.includes("framer.com/edit") || src.includes("editorbar")))
+                ) {
+                  node.remove();
+                } else if (node.querySelectorAll) {
+                  const nested = node.querySelectorAll(editorbarSelector);
+                  for (let k = 0; k < nested.length; k++) {
+                    nested[k].remove();
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        if (document.documentElement) {
+          editorbarObserver.observe(document.documentElement, { childList: true, subtree: true });
+        } else {
+          document.addEventListener("DOMContentLoaded", () => {
+            if (document.documentElement) {
+              editorbarObserver.observe(document.documentElement, { childList: true, subtree: true });
+            }
+          });
+        }
+
+        purgeEditorBar();
+        document.addEventListener("DOMContentLoaded", purgeEditorBar);
+        window.addEventListener("load", purgeEditorBar);
+        const timer = setInterval(purgeEditorBar, 100);
+        setTimeout(() => clearInterval(timer), 4000);
+      })();
+    </script>
+
+    <!-- Wait-for-CSS Smooth Page Fade & Navigation Interceptor -->
+    <script is:inline>
+      (() => {
+        // 1. Manual scroll restoration to prevent browser from restoring footer scroll position
+        if ("scrollRestoration" in history) {
+          history.scrollRestoration = "manual";
+        }
+
+        // Scroll-to-top helper
+        function resetScrollToTop() {
+          if (!window.location.hash) {
+            try {
+              window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+            } catch {
+              window.scrollTo(0, 0);
+            }
+            if (document.documentElement) {
+              document.documentElement.scrollTop = 0;
+            }
+            if (document.body) {
+              document.body.scrollTop = 0;
+            }
+            if (window.lenis && typeof window.lenis.scrollTo === "function") {
+              try {
+                window.lenis.scrollTo(0, { immediate: true });
+              } catch {}
+            }
+          }
+        }
+
+        resetScrollToTop();
+        setTimeout(resetScrollToTop, 50);
+        setTimeout(resetScrollToTop, 150);
+
+        // Reset state on pageshow/pagehide (e.g. browser back/forward navigation)
+        window.addEventListener("pageshow", () => {
+          isNavigating = false;
+          resetScrollToTop();
+          setTimeout(resetScrollToTop, 50);
+          setTimeout(resetScrollToTop, 150);
+        });
+        window.addEventListener("pagehide", () => {
+          isNavigating = false;
+        });
+
+        // Helper: convert any internal link (./, ../, framer staging origin, relative slug) to clean root-relative path
+        function toCleanRootPath(rawHref) {
+          if (!rawHref) return rawHref;
+
+          if (
+            rawHref.startsWith("#") ||
+            rawHref.startsWith("mailto:") ||
+            rawHref.startsWith("tel:") ||
+            rawHref.startsWith("javascript:")
+          ) {
+            return rawHref;
+          }
+
+          let h = rawHref;
+
+          // 1. Strip Framer staging host or current origin
+          const framerOrigin = "https://appreciated-presentation-820071.framer.app";
+          if (h.startsWith(framerOrigin)) {
+            h = h.slice(framerOrigin.length) || "/";
+          } else if (h.startsWith("http://appreciated-presentation-820071.framer.app")) {
+            h = h.slice("http://appreciated-presentation-820071.framer.app".length) || "/";
+          } else if (typeof window !== "undefined" && h.startsWith(window.location.origin)) {
+            h = h.slice(window.location.origin.length) || "/";
+          } else if (h.startsWith("http://") || h.startsWith("https://")) {
+            return rawHref;
+          }
+
+          // 2. Normalize parent directory navigation: ../, ../../, etc.
+          if (h.startsWith("../") || h === "..") {
+            h = h.replace(/^(\.\.\/)+/, "/").replace(/^\.\.$/, "/");
+          }
+
+          // 3. Normalize current directory navigation: ./, .
+          if (h.startsWith("./") || h === ".") {
+            h = h.replace(/^\.\//, "/").replace(/^\.$/, "/");
+          }
+
+          // 4. Collapse duplicate /blog/blog/...
+          h = h.replace(/^(\/?blog)\/(blog\/)+/i, "$1/");
+
+          // 5. Canonical Blog Slug Mapping & Normalization
+          const blogSlugMap = {
+            "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "blog-homepage-traffic",
+            "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "blog-creative-fatigue",
+            "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "blog-conversion-architecture",
+            "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "blog-page-speed",
+            "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "blog-video-ads",
+            "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "blog-video-ads",
+            "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "blog-ecommerce-cro",
+            "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "blog-ecommerce-cro",
+            "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "blog-visual-identity",
+            "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "blog-visual-identity",
+            "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "blog-unified-growth"
+          };
+
+          const noLeadingSlash = h.replace(/^\/+/, "");
+          const slugCandidate = noLeadingSlash.replace(/^blog\//i, "").replace(/\/$/, "");
+          if (blogSlugMap[slugCandidate]) {
+            h = "/blog/" + blogSlugMap[slugCandidate];
+          } else if (
+            noLeadingSlash.startsWith("blog-") ||
+            noLeadingSlash.startsWith("how-category-") ||
+            noLeadingSlash.startsWith("the-3-second-") ||
+            noLeadingSlash.startsWith("the-7-day-") ||
+            noLeadingSlash.startsWith("creative-fatigue-") ||
+            noLeadingSlash.startsWith("fixing-the-leaky-") ||
+            noLeadingSlash.startsWith("every-extra-second-") ||
+            noLeadingSlash.startsWith("why-hiring-") ||
+            noLeadingSlash.startsWith("why-sending-")
+          ) {
+            h = "/blog/" + slugCandidate;
+          }
+
+          // 6. Ensure leading slash
+          if (!h.startsWith("/")) {
+            h = "/" + h;
+          }
+
+          // 7. Clean up multiple slashes
+          h = h.replace(/\/+/g, "/");
+
+          if (h === "") h = "/";
+
+          // Clean trailing slash for named routes, keep "/" for root
+          if (h.length > 1 && h.endsWith("/")) {
+            h = h.slice(0, -1);
+          }
+
+          return h;
+        }
+
+        // Expose globally for DOM normalizer and external scripts
+        window.__toCleanRootPath = toCleanRootPath;
+
+        // Prefetch internal links on pointerover/mouseenter and touchstart (<link rel="prefetch" href="...">)
+        const prefetchedUrls = new Set();
+        function prefetchTarget(rawHref) {
+          if (!rawHref) return;
+          const clean = toCleanRootPath(rawHref);
+          if (
+            !clean ||
+            !clean.startsWith("/") ||
+            clean.startsWith("//") ||
+            clean.includes("mailto:") ||
+            clean.includes("tel:") ||
+            clean.includes("#")
+          ) {
+            return;
+          }
+          const fullUrl = window.location.origin + clean;
+          if (fullUrl === window.location.href || prefetchedUrls.has(fullUrl)) return;
+          prefetchedUrls.add(fullUrl);
+
+          try {
+            const link = document.createElement("link");
+            link.rel = "prefetch";
+            link.href = fullUrl;
+            link.as = "document";
+            document.head.appendChild(link);
+          } catch (e) {}
+        }
+
+        document.addEventListener(
+          "pointerover",
+          (e) => {
+            const a = e.target.closest("a");
+            if (a) prefetchTarget(a.getAttribute("href"));
+          },
+          { passive: true }
+        );
+
+        document.addEventListener(
+          "touchstart",
+          (e) => {
+            const a = e.target.closest("a");
+            if (a) prefetchTarget(a.getAttribute("href"));
+          },
+          { passive: true }
+        );
+
+        // Immediate navigation for simultaneous native view transitions (0ms delay)
+        let isNavigating = false;
+
+        document.addEventListener(
+          "click",
+          (e) => {
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+            const a = e.target.closest("a");
+            if (!a) return;
+
+            // Do not intercept Claim Your Sprint button
+            if (
+              a.textContent &&
+              (a.textContent.includes("Claim Your Sprint") ||
+                a.textContent.includes("Submitting...") ||
+                a.textContent.includes("Sprint Claimed"))
+            ) {
+              return;
+            }
+
+            const rawHref = a.getAttribute("href");
+            if (!rawHref) return;
+
+            if (
+              rawHref.startsWith("#") ||
+              rawHref.startsWith("mailto:") ||
+              rawHref.startsWith("tel:") ||
+              rawHref.startsWith("javascript:") ||
+              a.target === "_blank" ||
+              a.hasAttribute("download")
+            ) {
+              return;
+            }
+
+            const cleanRoute = toCleanRootPath(rawHref);
+            let targetUrl = null;
+
+            if (cleanRoute && cleanRoute.startsWith("/")) {
+              targetUrl = window.location.origin + cleanRoute;
+            }
+
+            if (targetUrl) {
+              let targetObj;
+              try {
+                targetObj = new URL(targetUrl, window.location.origin);
+              } catch {
+                return;
+              }
+
+              if (targetObj.pathname === window.location.pathname && targetObj.search === window.location.search) {
+                if (targetObj.hash) {
+                  e.preventDefault();
+                  const targetEl = document.getElementById(targetObj.hash.slice(1));
+                  if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+                  history.replaceState(null, "", targetObj.pathname + targetObj.hash);
+                  return;
+                }
+                // Otherwise (exact same URL), just return cleanly without locking isNavigating
+                return;
+              }
+
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              e.stopPropagation();
+
+              if (isNavigating) return;
+              isNavigating = true;
+              setTimeout(() => {
+                isNavigating = false;
+              }, 1200);
+
+              // Immediate navigation so browser's @view-transition captures both outgoing and incoming pages simultaneously
+              try {
+                window.location.href = targetUrl;
+              } catch {
+                isNavigating = false;
+              }
+            }
+          },
+          true
+        );
+      })();
+    </script>
+
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+
+    <!-- Footer 'Work' Removal System -->
+    <script is:inline>
+      (() => {
+        function removeWorkAndCollapseGap() {
+          document.querySelectorAll("a, p, span").forEach((el) => {
+            const isWorkText = el.children.length === 0 && (el.textContent || "").trim() === "Work";
+            const isWorkHref = el.tagName === "A" && /\/work$/i.test(el.getAttribute("href") || "");
+
+            if (isWorkText || isWorkHref) {
+              let targetToHide = el.closest("a") || el;
+              while (
+                targetToHide.parentElement &&
+                targetToHide.parentElement.tagName !== "BODY" &&
+                targetToHide.parentElement.tagName !== "NAV" &&
+                targetToHide.parentElement.tagName !== "FOOTER" &&
+                (targetToHide.parentElement.textContent || "").trim() === "Work"
+              ) {
+                targetToHide = targetToHide.parentElement;
+              }
+              if (targetToHide.style.display !== "none") {
+                targetToHide.style.setProperty("display", "none", "important");
+              }
+            }
+          });
+        }
+
+        removeWorkAndCollapseGap();
+        document.addEventListener("DOMContentLoaded", removeWorkAndCollapseGap);
+        window.addEventListener("load", removeWorkAndCollapseGap);
+
+        let workPending = false;
+        const workObserver = new MutationObserver(() => {
+          if (workPending) return;
+          workPending = true;
+          requestAnimationFrame(() => {
+            workPending = false;
+            removeWorkAndCollapseGap();
+          });
+        });
+        workObserver.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+        });
+      })();
+    </script>
+
+    <!-- Client-Side Duplicate Bullet Cleaner (Hydration Guard) -->
+    <script is:inline>
+      (() => {
+        function cleanDuplicateBullets() {
+          const items = document.querySelectorAll(
+            "li, p, .framer-text, [data-framer-component-type='RichTextContainer']"
+          );
+          for (let i = 0; i < items.length; i++) {
+            const el = items[i];
+            const text = el.textContent || "";
+            if (
+              text.includes("Enraux Client Portal") ||
+              text.includes("Discord & Google Meet")
+            ) {
+              const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+              let node;
+              while ((node = walker.nextNode())) {
+                const val = node.nodeValue;
+                if (val && /[•·\u2022]/.test(val)) {
+                  const newVal = val.replace(/[•·\u2022]/g, "").replace(/^\s+/, "");
+                  if (newVal !== val) {
+                    node.nodeValue = newVal;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Run immediately and on DOM/window lifecycle events
+        cleanDuplicateBullets();
+        document.addEventListener("DOMContentLoaded", cleanDuplicateBullets);
+        window.addEventListener("load", cleanDuplicateBullets);
+
+        // Use MutationObserver to catch client-side hydration (e.g. Framer script_main)
+        let bulletPending = false;
+        const observer = new MutationObserver(() => {
+          if (bulletPending) return;
+          bulletPending = true;
+          requestAnimationFrame(() => {
+            bulletPending = false;
+            cleanDuplicateBullets();
+          });
+        });
+        observer.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+
+        const bulletInterval = setInterval(cleanDuplicateBullets, 100);
+        setTimeout(() => clearInterval(bulletInterval), 3000);
+      })();
+    </script>
+
+    <!-- Unified Country Code + WhatsApp Input Combo -->
+    <script is:inline>
+      (() => {
+        const PRIORITY_COUNTRIES = [
+          { name: "United States", code: "+1", iso: "US" },
+          { name: "United Kingdom", code: "+44", iso: "GB" },
+          { name: "Canada", code: "+1", iso: "CA" },
+          { name: "Nigeria", code: "+234", iso: "NG" },
+          { name: "Australia", code: "+61", iso: "AU" },
+          { name: "United Arab Emirates", code: "+971", iso: "AE" },
+          { name: "Germany", code: "+49", iso: "DE" },
+          { name: "France", code: "+33", iso: "FR" },
+          { name: "South Africa", code: "+27", iso: "ZA" },
+          { name: "India", code: "+91", iso: "IN" }
+        ];
+
+        const ALL_COUNTRIES = [
+          { name: "Afghanistan", code: "+93", iso: "AF" },
+          { name: "Albania", code: "+355", iso: "AL" },
+          { name: "Algeria", code: "+213", iso: "DZ" },
+          { name: "Andorra", code: "+376", iso: "AD" },
+          { name: "Angola", code: "+244", iso: "AO" },
+          { name: "Antigua and Barbuda", code: "+1268", iso: "AG" },
+          { name: "Argentina", code: "+54", iso: "AR" },
+          { name: "Armenia", code: "+374", iso: "AM" },
+          { name: "Australia", code: "+61", iso: "AU" },
+          { name: "Austria", code: "+43", iso: "AT" },
+          { name: "Azerbaijan", code: "+994", iso: "AZ" },
+          { name: "Bahamas", code: "+1242", iso: "BS" },
+          { name: "Bahrain", code: "+973", iso: "BH" },
+          { name: "Bangladesh", code: "+880", iso: "BD" },
+          { name: "Barbados", code: "+1246", iso: "BB" },
+          { name: "Belarus", code: "+375", iso: "BY" },
+          { name: "Belgium", code: "+32", iso: "BE" },
+          { name: "Belize", code: "+501", iso: "BZ" },
+          { name: "Benin", code: "+229", iso: "BJ" },
+          { name: "Bhutan", code: "+975", iso: "BT" },
+          { name: "Bolivia", code: "+591", iso: "BO" },
+          { name: "Bosnia and Herzegovina", code: "+387", iso: "BA" },
+          { name: "Botswana", code: "+267", iso: "BW" },
+          { name: "Brazil", code: "+55", iso: "BR" },
+          { name: "Brunei", code: "+673", iso: "BN" },
+          { name: "Bulgaria", code: "+359", iso: "BG" },
+          { name: "Burkina Faso", code: "+226", iso: "BF" },
+          { name: "Burundi", code: "+257", iso: "BI" },
+          { name: "Cambodia", code: "+855", iso: "KH" },
+          { name: "Cameroon", code: "+237", iso: "CM" },
+          { name: "Canada", code: "+1", iso: "CA" },
+          { name: "Cape Verde", code: "+238", iso: "CV" },
+          { name: "Central African Republic", code: "+236", iso: "CF" },
+          { name: "Chad", code: "+235", iso: "TD" },
+          { name: "Chile", code: "+56", iso: "CL" },
+          { name: "China", code: "+86", iso: "CN" },
+          { name: "Colombia", code: "+57", iso: "CO" },
+          { name: "Comoros", code: "+269", iso: "KM" },
+          { name: "Congo", code: "+242", iso: "CG" },
+          { name: "Costa Rica", code: "+506", iso: "CR" },
+          { name: "Croatia", code: "+385", iso: "HR" },
+          { name: "Cuba", code: "+53", iso: "CU" },
+          { name: "Cyprus", code: "+357", iso: "CY" },
+          { name: "Czech Republic", code: "+420", iso: "CZ" },
+          { name: "Denmark", code: "+45", iso: "DK" },
+          { name: "Djibouti", code: "+253", iso: "DJ" },
+          { name: "Dominica", code: "+1767", iso: "DM" },
+          { name: "Dominican Republic", code: "+1809", iso: "DO" },
+          { name: "Ecuador", code: "+593", iso: "EC" },
+          { name: "Egypt", code: "+20", iso: "EG" },
+          { name: "El Salvador", code: "+503", iso: "SV" },
+          { name: "Equatorial Guinea", code: "+240", iso: "GQ" },
+          { name: "Eritrea", code: "+291", iso: "ER" },
+          { name: "Estonia", code: "+372", iso: "EE" },
+          { name: "Eswatini", code: "+268", iso: "SZ" },
+          { name: "Ethiopia", code: "+251", iso: "ET" },
+          { name: "Fiji", code: "+679", iso: "FJ" },
+          { name: "Finland", code: "+358", iso: "FI" },
+          { name: "France", code: "+33", iso: "FR" },
+          { name: "Gabon", code: "+241", iso: "GA" },
+          { name: "Gambia", code: "+220", iso: "GM" },
+          { name: "Georgia", code: "+995", iso: "GE" },
+          { name: "Germany", code: "+49", iso: "DE" },
+          { name: "Ghana", code: "+233", iso: "GH" },
+          { name: "Greece", code: "+30", iso: "GR" },
+          { name: "Grenada", code: "+1473", iso: "GD" },
+          { name: "Guatemala", code: "+502", iso: "GT" },
+          { name: "Guinea", code: "+224", iso: "GN" },
+          { name: "Guyana", code: "+592", iso: "GY" },
+          { name: "Haiti", code: "+509", iso: "HT" },
+          { name: "Honduras", code: "+504", iso: "HN" },
+          { name: "Hong Kong", code: "+852", iso: "HK" },
+          { name: "Hungary", code: "+36", iso: "HU" },
+          { name: "Iceland", code: "+354", iso: "IS" },
+          { name: "India", code: "+91", iso: "IN" },
+          { name: "Indonesia", code: "+62", iso: "ID" },
+          { name: "Iran", code: "+98", iso: "IR" },
+          { name: "Iraq", code: "+964", iso: "IQ" },
+          { name: "Ireland", code: "+353", iso: "IE" },
+          { name: "Israel", code: "+972", iso: "IL" },
+          { name: "Italy", code: "+39", iso: "IT" },
+          { name: "Ivory Coast", code: "+225", iso: "CI" },
+          { name: "Jamaica", code: "+1876", iso: "JM" },
+          { name: "Japan", code: "+81", iso: "JP" },
+          { name: "Jordan", code: "+962", iso: "JO" },
+          { name: "Kazakhstan", code: "+7", iso: "KZ" },
+          { name: "Kenya", code: "+254", iso: "KE" },
+          { name: "Kuwait", code: "+965", iso: "KW" },
+          { name: "Kyrgyzstan", code: "+996", iso: "KG" },
+          { name: "Laos", code: "+856", iso: "LA" },
+          { name: "Latvia", code: "+371", iso: "LV" },
+          { name: "Lebanon", code: "+961", iso: "LB" },
+          { name: "Lesotho", code: "+266", iso: "LS" },
+          { name: "Liberia", code: "+231", iso: "LR" },
+          { name: "Libya", code: "+218", iso: "LY" },
+          { name: "Liechtenstein", code: "+423", iso: "LI" },
+          { name: "Lithuania", code: "+370", iso: "LT" },
+          { name: "Luxembourg", code: "+352", iso: "LU" },
+          { name: "Madagascar", code: "+261", iso: "MG" },
+          { name: "Malawi", code: "+265", iso: "MW" },
+          { name: "Malaysia", code: "+60", iso: "MY" },
+          { name: "Maldives", code: "+960", iso: "MV" },
+          { name: "Mali", code: "+223", iso: "ML" },
+          { name: "Malta", code: "+356", iso: "MT" },
+          { name: "Mauritania", code: "+222", iso: "MR" },
+          { name: "Mauritius", code: "+230", iso: "MU" },
+          { name: "Mexico", code: "+52", iso: "MX" },
+          { name: "Moldova", code: "+373", iso: "MD" },
+          { name: "Monaco", code: "+377", iso: "MC" },
+          { name: "Mongolia", code: "+976", iso: "MN" },
+          { name: "Montenegro", code: "+382", iso: "ME" },
+          { name: "Morocco", code: "+212", iso: "MA" },
+          { name: "Mozambique", code: "+258", iso: "MZ" },
+          { name: "Myanmar", code: "+95", iso: "MM" },
+          { name: "Namibia", code: "+264", iso: "NA" },
+          { name: "Nepal", code: "+977", iso: "NP" },
+          { name: "Netherlands", code: "+31", iso: "NL" },
+          { name: "New Zealand", code: "+64", iso: "NZ" },
+          { name: "Nicaragua", code: "+505", iso: "NI" },
+          { name: "Niger", code: "+227", iso: "NE" },
+          { name: "Nigeria", code: "+234", iso: "NG" },
+          { name: "North Macedonia", code: "+389", iso: "MK" },
+          { name: "Norway", code: "+47", iso: "NO" },
+          { name: "Oman", code: "+968", iso: "OM" },
+          { name: "Pakistan", code: "+92", iso: "PK" },
+          { name: "Panama", code: "+507", iso: "PA" },
+          { name: "Paraguay", code: "+595", iso: "PY" },
+          { name: "Peru", code: "+51", iso: "PE" },
+          { name: "Philippines", code: "+63", iso: "PH" },
+          { name: "Poland", code: "+48", iso: "PL" },
+          { name: "Portugal", code: "+351", iso: "PT" },
+          { name: "Qatar", code: "+974", iso: "QA" },
+          { name: "Romania", code: "+40", iso: "RO" },
+          { name: "Russia", code: "+7", iso: "RU" },
+          { name: "Rwanda", code: "+250", iso: "RW" },
+          { name: "Saudi Arabia", code: "+966", iso: "SA" },
+          { name: "Senegal", code: "+221", iso: "SN" },
+          { name: "Serbia", code: "+381", iso: "RS" },
+          { name: "Seychelles", code: "+248", iso: "SC" },
+          { name: "Sierra Leone", code: "+232", iso: "SL" },
+          { name: "Singapore", code: "+65", iso: "SG" },
+          { name: "Slovakia", code: "+421", iso: "SK" },
+          { name: "Slovenia", code: "+386", iso: "SI" },
+          { name: "Somalia", code: "+252", iso: "SO" },
+          { name: "South Africa", code: "+27", iso: "ZA" },
+          { name: "South Korea", code: "+82", iso: "KR" },
+          { name: "Spain", code: "+34", iso: "ES" },
+          { name: "Sri Lanka", code: "+94", iso: "LK" },
+          { name: "Sudan", code: "+249", iso: "SD" },
+          { name: "Suriname", code: "+597", iso: "SR" },
+          { name: "Sweden", code: "+46", iso: "SE" },
+          { name: "Switzerland", code: "+41", iso: "CH" },
+          { name: "Taiwan", code: "+886", iso: "TW" },
+          { name: "Tanzania", code: "+255", iso: "TZ" },
+          { name: "Thailand", code: "+66", iso: "TH" },
+          { name: "Togo", code: "+228", iso: "TG" },
+          { name: "Trinidad and Tobago", code: "+1868", iso: "TT" },
+          { name: "Tunisia", code: "+216", iso: "TN" },
+          { name: "Turkey", code: "+90", iso: "TR" },
+          { name: "Uganda", code: "+256", iso: "UG" },
+          { name: "Ukraine", code: "+380", iso: "UA" },
+          { name: "United Arab Emirates", code: "+971", iso: "AE" },
+          { name: "United Kingdom", code: "+44", iso: "GB" },
+          { name: "United States", code: "+1", iso: "US" },
+          { name: "Uruguay", code: "+598", iso: "UY" },
+          { name: "Uzbekistan", code: "+998", iso: "UZ" },
+          { name: "Venezuela", code: "+58", iso: "VE" },
+          { name: "Vietnam", code: "+84", iso: "VN" },
+          { name: "Yemen", code: "+967", iso: "YE" },
+          { name: "Zambia", code: "+260", iso: "ZM" },
+          { name: "Zimbabwe", code: "+263", iso: "ZW" }
+        ];
+
+        function buildCountryOptionsHTML() {
+          let html = '<option value="" disabled selected label="Country (+)">Country (+)</option>';
+          PRIORITY_COUNTRIES.forEach((c) => {
+            html += `<option value="${c.iso}|${c.code}">${c.name} (${c.code})</option>`;
+          });
+          html += '<option value="" disabled>──────────</option>';
+          ALL_COUNTRIES.forEach((c) => {
+            html += `<option value="${c.iso}|${c.code}">${c.name} (${c.code})</option>`;
+          });
+          return html;
+        }
+
+        const PRIMARY_ISOS = new Set(["US", "GB", "RU", "AU", "DE", "FR", "IN", "ZA", "NG", "AE"]);
+
+        const countryMap = new Map();
+        PRIORITY_COUNTRIES.forEach((c) => {
+          if (!countryMap.has(c.iso)) countryMap.set(c.iso, c);
+        });
+        ALL_COUNTRIES.forEach((c) => {
+          if (!countryMap.has(c.iso)) countryMap.set(c.iso, c);
+        });
+
+        const SORTED_DIAL_CODES = Array.from(countryMap.values()).map((c) => ({
+          name: c.name,
+          code: c.code,
+          iso: c.iso,
+          value: `${c.iso}|${c.code}`,
+          digits: c.code.replace(/^\+/, "")
+        }));
+
+        SORTED_DIAL_CODES.sort((a, b) => {
+          if (b.digits.length !== a.digits.length) {
+            return b.digits.length - a.digits.length;
+          }
+          const aPri = PRIMARY_ISOS.has(a.iso) ? 1 : 0;
+          const bPri = PRIMARY_ISOS.has(b.iso) ? 1 : 0;
+          if (bPri !== aPri) {
+            return bPri - aPri;
+          }
+          return a.name.localeCompare(b.name);
+        });
+
+        function matchCountryByPhoneInput(rawValue, countrySelect, optionalTelInput) {
+          if (!countrySelect) return;
+          const telInput =
+            optionalTelInput ||
+            countrySelect.closest(".enraux-phone-combo")?.querySelector('input[type="tel"]') ||
+            null;
+          const raw = (rawValue || "").trim();
+          if (!raw.startsWith("+")) {
+            if (countrySelect.dataset.enrauxSource === "auto") {
+              countrySelect.selectedIndex = 0;
+              delete countrySelect.dataset.enrauxSource;
+            }
+            if (telInput && (!raw || !raw.startsWith("+"))) {
+              delete telInput.dataset.enrauxDialCode;
+            }
+            return;
+          }
+
+          const digitsAfterPlus = raw.slice(1).replace(/[\s\-\.\(\)]/g, "");
+          if (!digitsAfterPlus) {
+            if (countrySelect.dataset.enrauxSource === "auto") {
+              countrySelect.selectedIndex = 0;
+              delete countrySelect.dataset.enrauxSource;
+            }
+            if (telInput) {
+              delete telInput.dataset.enrauxDialCode;
+            }
+            return;
+          }
+
+          let matched = null;
+          for (let i = 0; i < SORTED_DIAL_CODES.length; i++) {
+            const item = SORTED_DIAL_CODES[i];
+            if (digitsAfterPlus.startsWith(item.digits)) {
+              matched = item;
+              break;
+            }
+          }
+
+          if (matched) {
+            if (countrySelect.dataset.enrauxSource === "manual" && countrySelect.value) {
+              const curDialCode = (countrySelect.value.split("|")[1] || "").trim();
+              if (curDialCode === matched.code) {
+                if (telInput) {
+                  telInput.dataset.enrauxDialCode = matched.code;
+                }
+                return;
+              }
+            }
+
+            if (countrySelect.value !== matched.value) {
+              countrySelect.value = matched.value;
+            }
+            countrySelect.dataset.enrauxSource = "auto";
+            if (telInput) {
+              telInput.dataset.enrauxDialCode = matched.code;
+            }
+          } else {
+            if (countrySelect.dataset.enrauxSource === "auto") {
+              countrySelect.selectedIndex = 0;
+              delete countrySelect.dataset.enrauxSource;
+            }
+            if (telInput) {
+              delete telInput.dataset.enrauxDialCode;
+            }
+          }
+        }
+
+        window.__matchCountryByPhoneInput = matchCountryByPhoneInput;
+
+        const phoneStateCache = new Map();
+
+        function getFormKey(telInput) {
+          const form = telInput.closest("form");
+          if (!form) return "default";
+          const variant = telInput.closest("[data-framer-name]")?.getAttribute("data-framer-name") || "";
+          return (form.getAttribute("action") || "") + ":" + variant + ":" + (telInput.name || "tel");
+        }
+
+        function triggerCountryNudge(wrap) {
+          if (!wrap) return;
+          wrap.classList.add("enraux-country-nudge");
+          setTimeout(() => {
+            wrap.classList.remove("enraux-country-nudge");
+          }, 550);
+        }
+
+        function initPhoneCountryDropdowns() {
+          const telInputs = document.querySelectorAll("form input[type='tel']");
+          telInputs.forEach((telInput) => {
+            const wrapper =
+              telInput.closest(".framer-form-text-input") ||
+              telInput.closest(".framer-form-input-wrapper") ||
+              telInput.parentElement;
+            if (!wrapper) return;
+
+            wrapper.classList.add("enraux-phone-combo");
+
+            let wrap = wrapper.querySelector(".enraux-country-wrap");
+            let countrySelect = wrapper.querySelector("select.enraux-country-select");
+
+            const formKey = getFormKey(telInput);
+            const cachedState = phoneStateCache.get(formKey) || {};
+
+            if (!wrap || !countrySelect || wrap.nextElementSibling !== telInput) {
+              if (wrap) wrap.remove();
+
+              wrap = document.createElement("div");
+              wrap.className = "enraux-country-wrap";
+
+              countrySelect = document.createElement("select");
+              countrySelect.name = "Country Code";
+              countrySelect.className = "framer-form-input enraux-country-select";
+              countrySelect.setAttribute("aria-label", "Country and dialing code");
+              countrySelect.required = true;
+              countrySelect.innerHTML = buildCountryOptionsHTML();
+
+              wrap.appendChild(countrySelect);
+              wrapper.insertBefore(wrap, telInput);
+
+              countrySelect.dataset.enrauxBound = "true";
+              countrySelect.addEventListener("change", () => {
+                countrySelect.dataset.enrauxSource = "manual";
+                countrySelect.setCustomValidity("");
+                telInput.setCustomValidity("");
+                const val = countrySelect.value;
+                const state = phoneStateCache.get(formKey) || {};
+                state.country = val;
+
+                if (val && val.includes("|")) {
+                  const dialCode = (val.split("|")[1] || "").trim();
+                  const prevDialCode = telInput.dataset.enrauxDialCode || "";
+
+                  telInput._isSyncingFromDropdown = true;
+                  try {
+                    const current = (telInput.value || "").trim();
+                    if (!current) {
+                      telInput.value = dialCode + " ";
+                    } else if (current.startsWith("+")) {
+                      let subscriber = "";
+                      if (prevDialCode && current.startsWith(prevDialCode)) {
+                        subscriber = current.slice(prevDialCode.length).trimStart();
+                      } else {
+                        const match = current.match(/^\+\d+/);
+                        if (match) {
+                          subscriber = current.slice(match[0].length).trimStart();
+                        } else {
+                          subscriber = current.slice(1).trimStart();
+                        }
+                      }
+                      telInput.value = subscriber ? dialCode + " " + subscriber : dialCode + " ";
+                    } else {
+                      telInput.value = dialCode + " " + current;
+                    }
+                  } finally {
+                    telInput._isSyncingFromDropdown = false;
+                  }
+
+                  telInput.dataset.enrauxDialCode = dialCode;
+                  state.phone = telInput.value;
+                  phoneStateCache.set(formKey, state);
+
+                  telInput.focus();
+                  try {
+                    const len = telInput.value.length;
+                    telInput.setSelectionRange(len, len);
+                  } catch (err) {}
+                } else {
+                  const prevDialCode = telInput.dataset.enrauxDialCode || "";
+                  const curTrimmed = (telInput.value || "").trim();
+                  if (prevDialCode && curTrimmed === prevDialCode) {
+                    telInput.value = "";
+                  } else if (/^\+\d*$/.test(curTrimmed)) {
+                    telInput.value = "";
+                  }
+                  delete telInput.dataset.enrauxDialCode;
+                  state.phone = telInput.value;
+                  phoneStateCache.set(formKey, state);
+                }
+              });
+              countrySelect.addEventListener("input", () => {
+                countrySelect.setCustomValidity("");
+                telInput.setCustomValidity("");
+              });
+            }
+
+            // Keep telInput always enabled with unified placeholder
+            telInput.disabled = false;
+            telInput.placeholder = "WhatsApp number (or +code)";
+
+            if (!telInput.dataset.enrauxBound) {
+              telInput.dataset.enrauxBound = "true";
+
+              const handlePhoneInput = () => {
+                if (telInput._isSyncingFromDropdown) return;
+                telInput.setCustomValidity("");
+                countrySelect.setCustomValidity("");
+                matchCountryByPhoneInput(telInput.value, countrySelect, telInput);
+                const state = phoneStateCache.get(formKey) || {};
+                state.phone = telInput.value;
+                if (countrySelect.value) {
+                  state.country = countrySelect.value;
+                }
+                phoneStateCache.set(formKey, state);
+              };
+
+              telInput.addEventListener("input", handlePhoneInput);
+              telInput.addEventListener("change", handlePhoneInput);
+            }
+
+            // Restore cached values if available
+            if (cachedState.country && (!countrySelect.value || countrySelect.value === "")) {
+              countrySelect.value = cachedState.country;
+            }
+            if (cachedState.phone !== undefined && telInput.value === "") {
+              telInput.value = cachedState.phone;
+            }
+
+            // Track initial dialCode if country is selected
+            if (countrySelect.value && countrySelect.value.includes("|")) {
+              const initialCode = (countrySelect.value.split("|")[1] || "").trim();
+              if (initialCode) {
+                telInput.dataset.enrauxDialCode = initialCode;
+              }
+            }
+
+            // Check if input value matches any dial code on initialization
+            if (telInput.value) {
+              matchCountryByPhoneInput(telInput.value, countrySelect, telInput);
+            }
+          });
+        }
+
+        // Lifecycle executions
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initPhoneCountryDropdowns);
+        } else {
+          initPhoneCountryDropdowns();
+        }
+
+        window.addEventListener("load", initPhoneCountryDropdowns);
+        window.addEventListener("pageshow", initPhoneCountryDropdowns);
+        document.addEventListener("astro:page-load", initPhoneCountryDropdowns);
+
+        // rAF-throttled MutationObserver during 5000ms Framer hydration window
+        let isDropdownPending = false;
+        const dropdownObserver = new MutationObserver(() => {
+          if (isDropdownPending) return;
+          isDropdownPending = true;
+          requestAnimationFrame(() => {
+            isDropdownPending = false;
+            initPhoneCountryDropdowns();
+          });
+        });
+
+        dropdownObserver.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        setTimeout(() => {
+          dropdownObserver.disconnect();
+        }, 5000);
+
+        window.__initPhoneCountryDropdowns = initPhoneCountryDropdowns;
+
+        window.__getEnrauxFormattedPhone = function (formOrDoc) {
+          const root = formOrDoc || document;
+          const select = root.querySelector("select.enraux-country-select");
+          const tel = root.querySelector('input[type="tel"]');
+          if (!tel) return "";
+          let raw = (tel.value || "").trim();
+          if (!select || !select.value || !select.value.includes("|")) {
+            return raw;
+          }
+          const parts = select.value.split("|");
+          const dialCode = (parts[1] || "").trim();
+          if (!dialCode) return raw;
+
+          const codeDigits = dialCode.replace(/^\+/, "");
+          if (raw.startsWith(dialCode)) {
+            raw = raw.slice(dialCode.length).trim();
+          } else if (raw.startsWith("+" + codeDigits)) {
+            raw = raw.slice(("+" + codeDigits).length).trim();
+          } else if (codeDigits.length >= 2 && raw.startsWith(codeDigits)) {
+            raw = raw.slice(codeDigits.length).trim();
+          } else if (codeDigits === "1" && raw.startsWith("1") && raw.replace(/\D/g, "").length > 10) {
+            raw = raw.slice(1).trim();
+          } else if (raw.startsWith("+")) {
+            raw = raw.slice(1).trim();
+          }
+
+          if (raw.startsWith("0")) {
+            raw = raw.replace(/^0+/, "");
+          }
+
+          return raw ? `${dialCode} ${raw}` : dialCode;
+        };
+      })();
+    </script>
+
+    <!-- 'Claim Your Sprint' Submission Handler (Framer Hydration-Safe) -->
+    <script is:inline>
+      (() => {
+        let isClaimSubmitted = false;
+        let isSubmitting = false;
+
+        function setButtonLabel(btn, text) {
+          const p =
+            (btn && typeof btn.querySelector === "function"
+              ? btn.querySelector(".framer-104imqr p")
+              : null) ||
+            document.querySelector(".framer-1696s4l-container .framer-104imqr p");
+          if (p) {
+            p.textContent = text;
+            return;
+          }
+          if (!btn || typeof btn.querySelector !== "function") return;
+          const walker = document.createTreeWalker(btn, NodeFilter.SHOW_TEXT, null);
+          let node;
+          while ((node = walker.nextNode())) {
+            const val = (node.nodeValue || "").trim();
+            if (
+              val.includes("Claim Your Sprint") ||
+              val.includes("Submitting") ||
+              val.includes("Sprint Claimed") ||
+              val.includes("Failed") ||
+              val.includes("Send a Message")
+            ) {
+              node.nodeValue = text;
+              return;
+            }
+          }
+        }
+
+        function getVisibleFields(formOrDoc) {
+          const root = formOrDoc || document;
+          const all = Array.from(root.querySelectorAll("input, textarea, select"));
+          return all.filter((el) => {
+            if (
+              el.type === "hidden" ||
+              el.type === "submit" ||
+              el.getAttribute("tabindex") === "-1" ||
+              el.getAttribute("aria-hidden") === "true" ||
+              el.name === "framer-noscript" ||
+              el.style.transform === "scale(0)"
+            ) {
+              return false;
+            }
+            const style = window.getComputedStyle(el);
+            if (style.display === "none" || style.visibility === "hidden") {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        function findClaimButton(target) {
+          if (!target || typeof target.closest !== "function") return null;
+          const btn =
+            target.closest(".framer-1696s4l-container button") ||
+            target.closest("button[type='submit']") ||
+            target.closest(".framer-1696s4l-container") ||
+            target.closest("[data-reset='button']");
+          if (!btn) return null;
+          const text = (btn.textContent || "").trim();
+          if (
+            text.includes("Claim Your Sprint") ||
+            text.includes("Submitting") ||
+            text.includes("Sprint Claimed") ||
+            text.includes("Failed") ||
+            text.includes("Send a Message")
+          ) {
+            return btn.querySelector("button") || btn;
+          }
+          return null;
+        }
+
+        async function handleClaimProcess(btn, e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+          }
+
+          if (isSubmitting) return;
+
+          const form =
+            (btn && typeof btn.closest === "function" ? btn.closest("form") : null) ||
+            document.querySelector("form[data-framer-form]") ||
+            document.querySelector("form");
+
+          const countrySelect = form
+            ? form.querySelector("select.enraux-country-select")
+            : document.querySelector("select.enraux-country-select");
+          const telInput = form
+            ? form.querySelector('input[type="tel"]')
+            : document.querySelector('input[type="tel"]');
+
+          // 1. Run matchCountryByPhoneInput before checking empty fields (handles autofill/paste)
+          if (telInput && countrySelect && typeof window.__matchCountryByPhoneInput === "function") {
+            window.__matchCountryByPhoneInput(telInput.value, countrySelect, telInput);
+          }
+          if (countrySelect) countrySelect.setCustomValidity("");
+          if (telInput) telInput.setCustomValidity("");
+
+          // 2. Validate Country selection (must be selected and contain "|")
+          if (!countrySelect || !countrySelect.value || !countrySelect.value.includes("|")) {
+            if (countrySelect) {
+              countrySelect.focus();
+              countrySelect.scrollIntoView({ behavior: "smooth", block: "center" });
+              const wrap = countrySelect.closest(".enraux-country-wrap");
+              if (wrap) {
+                wrap.classList.add("enraux-country-nudge");
+                setTimeout(() => wrap.classList.remove("enraux-country-nudge"), 550);
+              }
+              countrySelect.setCustomValidity("Please select your country or start your number with +country code");
+              countrySelect.reportValidity();
+            }
+            return;
+          }
+
+          // 3. Validate Phone subscriber digits (at least 5 subscriber digits after stripping leading +<dialCode>)
+          if (telInput) {
+            const parts = (countrySelect.value || "").split("|");
+            const dialCode = (parts[1] || "").trim();
+            const dialDigits = dialCode.replace(/^\+/, "");
+            let rawTel = (telInput.value || "").trim();
+
+            if (dialCode && rawTel.startsWith(dialCode)) {
+              rawTel = rawTel.slice(dialCode.length);
+            } else if (dialDigits && rawTel.startsWith("+" + dialDigits)) {
+              rawTel = rawTel.slice(("+" + dialDigits).length);
+            } else if (dialDigits && dialDigits.length >= 2 && rawTel.startsWith(dialDigits)) {
+              rawTel = rawTel.slice(dialDigits.length);
+            } else if (dialDigits === "1" && rawTel.startsWith("1") && rawTel.replace(/\D/g, "").length > 10) {
+              rawTel = rawTel.slice(1);
+            } else if (rawTel.startsWith("+")) {
+              rawTel = rawTel.slice(1);
+            }
+
+            const subscriberDigits = rawTel.replace(/\D/g, "");
+            if (subscriberDigits.length < 5) {
+              telInput.focus();
+              telInput.scrollIntoView({ behavior: "smooth", block: "center" });
+              telInput.setCustomValidity("Please enter your full WhatsApp number");
+              telInput.reportValidity();
+              return;
+            }
+          }
+
+          // 4. Validate other visible fields in the form
+          const visible = getVisibleFields(form);
+          let emptyField = null;
+          for (const f of visible) {
+            if (f === countrySelect || f === telInput) continue;
+            const val = (f.value || "").trim();
+            if (!val) {
+              emptyField = f;
+              break;
+            }
+          }
+
+          if (emptyField) {
+            emptyField.focus();
+            emptyField.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (typeof emptyField.reportValidity === "function") emptyField.reportValidity();
+            return;
+          }
+
+          // Extract fields carefully from form
+          const name = (form ? (form.querySelector('input[name="Name"]') || form.querySelector('input[type="text"]:not([tabindex="-1"])')) : null)?.value?.trim() || "";
+          const email = (form ? form.querySelector('input[type="email"], input[name="Email"]') : null)?.value?.trim() || "";
+          const phone = typeof window.__getEnrauxFormattedPhone === "function" ? window.__getEnrauxFormattedPhone(form) : (telInput?.value?.trim() || "");
+          const country = countrySelect && countrySelect.selectedIndex > 0 ? (countrySelect.options[countrySelect.selectedIndex]?.textContent || "").trim() : "";
+          const service = (form ? form.querySelector('select[name="Service"]') : null)?.value?.trim() || "";
+          const message = (form ? form.querySelector('textarea') : null)?.value?.trim() || "";
+          const source_page = window.location.pathname;
+
+          // website_trap: check if any hidden honeypot input[aria-hidden="true"][tabindex="-1"] in form has a non-empty .value
+          let website_trap = "";
+          if (form) {
+            const trapInputs = form.querySelectorAll('input[aria-hidden="true"][tabindex="-1"], input[data-1p-ignore="true"][tabindex="-1"]');
+            for (const trap of trapInputs) {
+              if (trap && trap.value && trap.value.trim().length > 0) {
+                website_trap = trap.value.trim();
+                break;
+              }
+            }
+          }
+
+          const payload = {
+            name,
+            email,
+            phone,
+            country,
+            service,
+            message,
+            source_page,
+            website_trap,
+          };
+
+          // Loading & submission state (no DOM insertion)
+          isSubmitting = true;
+          setButtonLabel(btn, "Submitting...");
+          if (btn && btn.style) {
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.75";
+          }
+
+          try {
+            const res = await fetch("/api/contact", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+
+            let data = null;
+            try {
+              data = await res.json();
+            } catch (jsonErr) {}
+
+            if (res.ok && data && data.ok) {
+              setButtonLabel(btn, "Sprint Claimed ✓");
+              if (btn && btn.style) {
+                btn.style.pointerEvents = "auto";
+                btn.style.opacity = "1";
+              }
+
+              // Clear visible input and textarea values, and reset select
+              visible.forEach((f) => {
+                if (f === countrySelect || f === telInput) return;
+                if (f.tagName === "SELECT") {
+                  f.selectedIndex = 0;
+                  f.dispatchEvent(new Event("change", { bubbles: true }));
+                } else {
+                  f.value = "";
+                  f.dispatchEvent(new Event("input", { bubbles: true }));
+                }
+              });
+
+              // Also ensure textarea and select[name="Service"] are explicitly cleared if not in visible
+              if (form) {
+                const ta = form.querySelector("textarea");
+                if (ta) {
+                  ta.value = "";
+                  ta.dispatchEvent(new Event("input", { bubbles: true }));
+                }
+                const svc = form.querySelector('select[name="Service"]');
+                if (svc) {
+                  svc.selectedIndex = 0;
+                  svc.dispatchEvent(new Event("change", { bubbles: true }));
+                }
+              }
+
+              // Reset select.enraux-country-select & input[type="tel"]
+              const countrySelects = form
+                ? form.querySelectorAll("select.enraux-country-select")
+                : document.querySelectorAll("select.enraux-country-select");
+              countrySelects.forEach((cs) => {
+                cs.selectedIndex = 0;
+                delete cs.dataset.enrauxSource;
+                cs.setCustomValidity("");
+                cs.dispatchEvent(new Event("change", { bubbles: true }));
+                const combo = cs.closest(".enraux-phone-combo");
+                if (combo) {
+                  const tel = combo.querySelector('input[type="tel"]');
+                  if (tel) {
+                    tel.value = "";
+                    delete tel.dataset.enrauxDialCode;
+                    tel.disabled = false;
+                    tel.placeholder = "WhatsApp number (or +code)";
+                    tel.setCustomValidity("");
+                  }
+                }
+              });
+
+              // Reset any selected budget pills
+              if (typeof window.__resetActiveBudgetPills === "function") {
+                window.__resetActiveBudgetPills();
+              }
+
+              isClaimSubmitted = true;
+              isSubmitting = false;
+
+              // Smooth redirect to the Blog page after 750ms
+              setTimeout(() => {
+                window.location.href = window.location.origin + "/blog";
+              }, 750);
+            } else {
+              throw new Error((data && data.error) || `Request failed with status ${res.status}`);
+            }
+          } catch (err) {
+            console.error("Submission error:", err);
+            isSubmitting = false;
+            if (btn && btn.style) {
+              btn.style.pointerEvents = "auto";
+              btn.style.opacity = "1";
+            }
+            setButtonLabel(btn, "Failed — Try Again");
+            setTimeout(() => {
+              setButtonLabel(btn, "Claim Your Sprint");
+            }, 2500);
+          }
+        }
+
+        // Single click event listener in capture phase
+        window.addEventListener(
+          "click",
+          (e) => {
+            const btn = findClaimButton(e.target);
+            if (btn) {
+              handleClaimProcess(btn, e);
+            }
+          },
+          true
+        );
+
+        // Prevent native form submission so it doesn't trigger duplicate submits or page reload
+        window.addEventListener(
+          "submit",
+          (e) => {
+            const form = e.target;
+            if (
+              form &&
+              form.textContent &&
+              (form.textContent.includes("Claim Your Sprint") ||
+                form.textContent.includes("Submitting...") ||
+                form.textContent.includes("Sprint Claimed") ||
+                form.textContent.includes("Send a Message"))
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              const btn = findClaimButton(form.querySelector("button[type='submit']"));
+              if (btn) {
+                handleClaimProcess(btn, e);
+              }
+            }
+          },
+          true
+        );
+
+        // Hydration Guard via MutationObserver to preserve "Sprint Claimed ✓" state without DOM insertion
+        const claimObserver = new MutationObserver(() => {
+          if (isClaimSubmitted) {
+            const p = document.querySelector(".framer-1696s4l-container .framer-104imqr p");
+            if (p && p.textContent && p.textContent.includes("Claim Your Sprint")) {
+              p.textContent = "Sprint Claimed ✓";
+            }
+          }
+        });
+
+        claimObserver.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      })();
+    </script>
+
+    <!-- Project Budget Pills Interactive Selection System -->
+    <script is:inline>
+      (() => {
+        const PILL_TEXTS = [
+          "$200 Ad Trial",
+          "From $900 Landing Page",
+          "$3.5k/mo Retainer",
+          "$7.5k–$15k E-Com",
+          "$7.5k-$15k E-Com",
+          "$7k+ Brand Genesis",
+          "Custom Enterprise"
+        ];
+
+        let activeBudgetPillText = null;
+        let isPillMutating = false;
+
+        function getPillCleanText(el) {
+          if (!el) return "";
+          return (el.textContent || "").trim();
+        }
+
+        function isBudgetPillElement(el) {
+          if (!el) return false;
+          const text = getPillCleanText(el);
+          return PILL_TEXTS.some((t) => text.includes(t));
+        }
+
+        function findBudgetPillFromTarget(target) {
+          if (!target || typeof target.closest !== "function") return null;
+          if (target.closest("select, option, input, textarea, button")) return null;
+          const pill = target.closest(".framer-0WrPu");
+          return pill && isBudgetPillElement(pill) ? pill : null;
+        }
+
+        function applyPillStyles(pill, isSelected) {
+          if (!pill) return;
+          const hasSelected = pill.classList.contains("enraux-pill-selected");
+          const hasUnselected = pill.classList.contains("enraux-pill-unselected");
+          if (isSelected && hasSelected && pill.style.backgroundColor === "rgb(10, 10, 10)") {
+            return;
+          }
+          if (!isSelected && hasUnselected && pill.style.backgroundColor === "rgb(255, 255, 255)") {
+            return;
+          }
+
+          const bg = isSelected ? "#0a0a0a" : "#ffffff";
+          const fg = isSelected ? "#ffffff" : "#0a0a0a";
+          const border = isSelected ? "#0a0a0a" : "rgba(10, 10, 10, 0.15)";
+
+          if (isSelected) {
+            pill.classList.add("enraux-pill-selected");
+            pill.classList.remove("enraux-pill-unselected");
+          } else {
+            pill.classList.remove("enraux-pill-selected");
+            pill.classList.add("enraux-pill-unselected");
+          }
+
+          pill.style.setProperty("background-color", bg, "important");
+          pill.style.setProperty("color", fg, "important");
+          pill.style.setProperty("--border-color", border, "important");
+          pill.style.setProperty("border-color", border, "important");
+
+          const textElements = pill.querySelectorAll("p, span, .framer-text, div");
+          for (let i = 0; i < textElements.length; i++) {
+            const el = textElements[i];
+            el.style.setProperty("color", fg, "important");
+            el.style.setProperty("-webkit-text-fill-color", fg, "important");
+            el.style.setProperty("--framer-text-color", fg, "important");
+            el.style.setProperty("--extracted-r6o4lv", fg, "important");
+          }
+        }
+
+        function getAllBudgetPills() {
+          const all = document.querySelectorAll(".framer-0WrPu");
+          const results = [];
+          for (let i = 0; i < all.length; i++) {
+            if (isBudgetPillElement(all[i])) {
+              results.push(all[i]);
+            }
+          }
+          return results;
+        }
+
+        function syncServiceOptions(select) {
+          if (!select || !select.options || select.name !== "Service" || select.classList.contains("enraux-country-select")) return;
+
+          // 1. Separate $200 Ad Creative Trial from Retainer
+          for (let i = 0; i < select.options.length; i++) {
+            const opt = select.options[i];
+            if (
+              opt.value === "$200 Ad Creative Trial ($3.5k/mo)" ||
+              opt.textContent.trim() === "$200 Ad Creative Trial ($3.5k/mo)"
+            ) {
+              opt.value = "$200 Ad Creative Trial";
+              opt.textContent = "$200 Ad Creative Trial";
+            }
+          }
+
+          // 2. Insert Retainer option if not present
+          let hasRetainer = false;
+          let landingPageOpt = null;
+          for (let i = 0; i < select.options.length; i++) {
+            const opt = select.options[i];
+            if (opt.value.includes("Retainer") || opt.textContent.includes("Retainer")) {
+              hasRetainer = true;
+            }
+            if (opt.value.includes("Landing Page") || opt.textContent.includes("Landing Page")) {
+              landingPageOpt = opt;
+            }
+          }
+
+          if (!hasRetainer) {
+            const newOpt = document.createElement("option");
+            newOpt.value = "Creative & Growth Retainer ($3.5k/mo)";
+            newOpt.textContent = "Creative & Growth Retainer ($3.5k/mo)";
+            if (landingPageOpt && landingPageOpt.nextSibling) {
+              select.insertBefore(newOpt, landingPageOpt.nextSibling);
+            } else {
+              select.appendChild(newOpt);
+            }
+          }
+        }
+
+        function getServiceValueForPill(pillText) {
+          const t = (pillText || "").trim();
+          if (t.includes("$200")) return "$200 Ad Creative Trial";
+          if (t.includes("Landing Page") || t.includes("900")) return "High-Converting Landing Page (From $900)";
+          if (t.includes("Retainer") || t.includes("3.5k")) return "Creative & Growth Retainer ($3.5k/mo)";
+          if (t.includes("E-Com") || t.includes("7.5k")) return "High-Scale E-Commerce ($7.5k+)";
+          if (t.includes("Brand Genesis") || t.includes("20k") || t.includes("7k+")) return "$7k+ Brand Genesis";
+          if (t.includes("Enterprise") || t.includes("Custom")) return "Custom SaaS / Mobile App ($5k+)";
+          return null;
+        }
+
+        function handlePillClick(pill) {
+          if (!pill) return;
+          const clickedText = getPillCleanText(pill);
+          activeBudgetPillText = clickedText;
+
+          // Find container holding the sibling pills
+          const container =
+            pill.closest(".framer-f78C1") ||
+            pill.closest(".framer-czqroj-container") ||
+            pill.closest('[data-framer-name="Tag"]') ||
+            pill.closest("form") ||
+            document;
+
+          const groupPills = container.querySelectorAll(".framer-0WrPu");
+          for (let i = 0; i < groupPills.length; i++) {
+            const p = groupPills[i];
+            if (!isBudgetPillElement(p)) continue;
+            const pText = getPillCleanText(p);
+            if (p === pill || pText === clickedText) {
+              applyPillStyles(p, true);
+            } else {
+              applyPillStyles(p, false);
+            }
+          }
+
+          // Sync selection with Service dropdown synchronously with zero lag
+          const form = pill.closest("form") || document.querySelector("form");
+          const select = form
+            ? form.querySelector('select[name="Service"]')
+            : document.querySelector('select[name="Service"]');
+
+          if (select) {
+            syncServiceOptions(select);
+            const matchedVal = getServiceValueForPill(clickedText);
+            if (matchedVal) {
+              const nativeSelectSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLSelectElement.prototype,
+                "value"
+              )?.set;
+              if (nativeSelectSetter) {
+                nativeSelectSetter.call(select, matchedVal);
+              } else {
+                select.value = matchedVal;
+              }
+              select.dispatchEvent(new Event("input", { bubbles: true }));
+              select.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          }
+        }
+
+        // Single click event listener in capture phase
+        document.addEventListener(
+          "click",
+          (e) => {
+            const pill = findBudgetPillFromTarget(e.target);
+            if (pill) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              handlePillClick(pill);
+            }
+          },
+          true
+        );
+
+        // Reset helper for submission handler
+        window.__resetActiveBudgetPills = function () {
+          activeBudgetPillText = null;
+          const pills = getAllBudgetPills();
+          for (let i = 0; i < pills.length; i++) {
+            applyPillStyles(pills[i], false);
+          }
+        };
+
+        // Hydration Guard via MutationObserver to preserve active selection if React re-renders
+        function restoreSelectionState() {
+          if (isPillMutating) return;
+          if (!activeBudgetPillText) return;
+          isPillMutating = true;
+          try {
+            const pills = getAllBudgetPills();
+            for (let i = 0; i < pills.length; i++) {
+              const p = pills[i];
+              const pText = getPillCleanText(p);
+              if (pText === activeBudgetPillText) {
+                applyPillStyles(p, true);
+              } else {
+                applyPillStyles(p, false);
+              }
+            }
+          } finally {
+            isPillMutating = false;
+          }
+        }
+
+        // Initial sync of Service options on load/page transitions
+        function initServiceSync() {
+          const selects = document.querySelectorAll('select[name="Service"]');
+          selects.forEach(syncServiceOptions);
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initServiceSync);
+        } else {
+          initServiceSync();
+        }
+        document.addEventListener("astro:page-load", initServiceSync);
+
+        // Guard MutationObserver against infinite loops and input/textarea thrashing
+        const pillObserver = new MutationObserver((mutations) => {
+          let shouldCheck = false;
+          for (let i = 0; i < mutations.length; i++) {
+            const m = mutations[i];
+            const tag = m.target && m.target.tagName;
+            if (tag === "INPUT" || tag === "TEXTAREA") continue;
+            if (
+              m.target &&
+              m.target.closest &&
+              (m.target.closest("input") || m.target.closest("textarea"))
+            ) {
+              continue;
+            }
+            shouldCheck = true;
+            break;
+          }
+          if (!shouldCheck) return;
+          initServiceSync();
+          restoreSelectionState();
+        });
+
+        pillObserver.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+        });
+      })();
+    </script>
+
+    <!-- Blog Article DOM, Title & Playbook Badge Hydration Guard -->
+    <script is:inline>
+      (() => {
+        const rawPath = window.location.pathname;
+        const isBlog = rawPath.startsWith("/blog") || rawPath.startsWith("/blog-");
+        const cleanPath = rawPath.replace(/^\/blog\/?/, "").replace(/\/$/, "");
+        const isBlog1 =
+          cleanPath.includes("why-sending-paid-traffic") ||
+          cleanPath.includes("blog-homepage-traffic");
+
+        const playbookMap = {
+          "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "(Playbook 01 // Conversion)",
+          "blog-homepage-traffic": "(Playbook 01 // Conversion)",
+          "blog-creative-fatigue": "(Playbook 02 // Paid Social)",
+          "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "(Playbook 02 // Paid Social)",
+          "blog-conversion-architecture": "(Playbook 03 // Landing Pages)",
+          "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "(Playbook 03 // Landing Pages)",
+          "blog-page-speed": "(Playbook 04 // Engineering)",
+          "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "(Playbook 04 // Engineering)",
+          "blog-video-ads": "(Playbook 05 // Video Ads)",
+          "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "(Playbook 05 // Video Ads)",
+          "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "(Playbook 05 // Video Ads)",
+          "blog-ecommerce-cro": "(Playbook 06 // E-Commerce CRO)",
+          "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "(Playbook 06 // E-Commerce CRO)",
+          "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "(Playbook 06 // E-Commerce CRO)",
+          "blog-visual-identity": "(Playbook 07 // Brand Identity)",
+          "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "(Playbook 07 // Brand Identity)",
+          "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "(Playbook 07 // Brand Identity)",
+          "blog-unified-growth": "(Playbook 08 // Unified Growth)",
+          "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "(Playbook 08 // Unified Growth)"
+        };
+
+        function getExpectedBadge() {
+          if (playbookMap[cleanPath]) return playbookMap[cleanPath];
+          for (const key in playbookMap) {
+            if (cleanPath.includes(key)) return playbookMap[key];
+          }
+          const el = document.querySelector("[data-playbook-badge]");
+          if (el) return el.getAttribute("data-playbook-badge");
+          return null;
+        }
+
+        function enforcePlaybookBadge() {
+          const expected = getExpectedBadge();
+          if (!expected) return;
+
+          const badgeContainers = document.querySelectorAll(
+            '.framer-8dhyh3-container [data-framer-name="(Brands)"], [data-framer-name="(Brands)"], .framer-8dhyh3-container'
+          );
+          badgeContainers.forEach((container) => {
+            const paragraphs = container.querySelectorAll("p");
+            if (paragraphs.length > 0) {
+              paragraphs.forEach((p) => {
+                if (p.textContent !== expected) {
+                  p.textContent = expected;
+                }
+              });
+            } else if (container.tagName === "P" && container.textContent !== expected) {
+              container.textContent = expected;
+            }
+          });
+        }
+
+        // On the 7 generated blog pages: protect title, H1, and strip hydrate markers
+        if (isBlog && !isBlog1 && cleanPath !== "") {
+          const expectedTitle = document.title;
+          let expectedH1 = "";
+          const h1El = document.querySelector("h1");
+          if (h1El) expectedH1 = h1El.textContent;
+
+          function protectArticleDom() {
+            // 1. Guard Title
+            if (expectedTitle && document.title !== expectedTitle) {
+              document.title = expectedTitle;
+            }
+            // 2. Guard H1
+            if (expectedH1) {
+              const curH1 = document.querySelector("h1");
+              if (curH1 && curH1.textContent !== expectedH1) {
+                curH1.textContent = expectedH1;
+              }
+            }
+            // 3. Strip hydration dataset from #main so no script can hook it
+            const main = document.getElementById("main");
+            if (main && main.hasAttribute("data-framer-hydrate-v2")) {
+              main.removeAttribute("data-framer-hydrate-v2");
+              delete main.dataset.framerHydrateV2;
+            }
+            // 4. Enforce Playbook badge
+            enforcePlaybookBadge();
+          }
+
+          protectArticleDom();
+          document.addEventListener("DOMContentLoaded", protectArticleDom);
+          window.addEventListener("load", protectArticleDom);
+
+          const articleObserver = new MutationObserver(protectArticleDom);
+          articleObserver.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
+
+          const timer = setInterval(protectArticleDom, 50);
+          setTimeout(() => clearInterval(timer), 4000);
+        } else {
+          enforcePlaybookBadge();
+          document.addEventListener("DOMContentLoaded", enforcePlaybookBadge);
+          window.addEventListener("load", enforcePlaybookBadge);
+
+          const observer = new MutationObserver(enforcePlaybookBadge);
+          observer.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
+
+          const badgeTimer = setInterval(enforcePlaybookBadge, 50);
+          setTimeout(() => clearInterval(badgeTimer), 4000);
+        }
+      })();
+    </script>
+
+    <!-- Universal Link Normalizer & Hydration Guard (Rewrites ../, ./, and Framer links to clean root-relative paths) -->
+    <script is:inline>
+      (() => {
+        const cleanFn =
+          window.__toCleanRootPath ||
+          function (rawHref) {
+            if (!rawHref) return rawHref;
+            if (
+              rawHref.startsWith("#") ||
+              rawHref.startsWith("mailto:") ||
+              rawHref.startsWith("tel:") ||
+              rawHref.startsWith("javascript:")
+            ) {
+              return rawHref;
+            }
+            let h = rawHref;
+            const framerOrigin = "https://appreciated-presentation-820071.framer.app";
+            if (h.startsWith(framerOrigin)) {
+              h = h.slice(framerOrigin.length) || "/";
+            } else if (h.startsWith("http://appreciated-presentation-820071.framer.app")) {
+              h = h.slice("http://appreciated-presentation-820071.framer.app".length) || "/";
+            } else if (typeof window !== "undefined" && h.startsWith(window.location.origin)) {
+              h = h.slice(window.location.origin.length) || "/";
+            } else if (h.startsWith("http://") || h.startsWith("https://")) {
+              return rawHref;
+            }
+
+            if (h.startsWith("../") || h === "..") {
+              h = h.replace(/^(\.\.\/)+/, "/").replace(/^\.\.$/, "/");
+            }
+            if (h.startsWith("./") || h === ".") {
+              h = h.replace(/^\.\//, "/").replace(/^\.$/, "/");
+            }
+            h = h.replace(/^(\/?blog)\/(blog\/)+/i, "$1/");
+
+            const blogSlugMap = {
+              "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "blog-homepage-traffic",
+              "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "blog-creative-fatigue",
+              "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "blog-conversion-architecture",
+              "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "blog-page-speed",
+              "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "blog-video-ads",
+              "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "blog-video-ads",
+              "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "blog-ecommerce-cro",
+              "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "blog-ecommerce-cro",
+              "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "blog-visual-identity",
+              "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "blog-visual-identity",
+              "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "blog-unified-growth"
+            };
+
+            const noLeadingSlash = h.replace(/^\/+/, "");
+            const slugCandidate = noLeadingSlash.replace(/^blog\//i, "").replace(/\/$/, "");
+            if (blogSlugMap[slugCandidate]) {
+              h = "/blog/" + blogSlugMap[slugCandidate];
+            } else if (
+              noLeadingSlash.startsWith("blog-") ||
+              noLeadingSlash.startsWith("how-category-") ||
+              noLeadingSlash.startsWith("the-3-second-") ||
+              noLeadingSlash.startsWith("the-7-day-") ||
+              noLeadingSlash.startsWith("creative-fatigue-") ||
+              noLeadingSlash.startsWith("fixing-the-leaky-") ||
+              noLeadingSlash.startsWith("every-extra-second-") ||
+              noLeadingSlash.startsWith("why-hiring-") ||
+              noLeadingSlash.startsWith("why-sending-")
+            ) {
+              h = "/blog/" + slugCandidate;
+            }
+
+            if (!h.startsWith("/")) h = "/" + h;
+            h = h.replace(/\/+/g, "/");
+            if (h === "") h = "/";
+            if (h.length > 1 && h.endsWith("/")) h = h.slice(0, -1);
+            return h;
+          };
+
+        function guardLocationTextColor() {
+          try {
+            const pathname = window.location.pathname;
+            const isHome = pathname === "/" || pathname === "/index.html" || pathname === "";
+            const locations = document.querySelectorAll('.framer-12n5vg9[data-framer-name="Location"], .framer-12n5vg9');
+            locations.forEach((loc) => {
+              const basedInP = loc.querySelector('.framer-10chgwv p, [data-framer-name="Based in"] p');
+              let isDarkHeader = !isHome;
+              if (basedInP) {
+                const colorVal = window.getComputedStyle(basedInP).color;
+                if (colorVal && !colorVal.includes("255, 255, 255")) {
+                  isDarkHeader = true;
+                }
+              }
+              if (isDarkHeader) {
+                const sfDiv = loc.querySelector('.framer-da95kg, [data-framer-name="San Francisco"]');
+                const sfP = sfDiv ? sfDiv.querySelector('p') : null;
+                const darkToken = 'var(--token-ac90cf53-d6a6-4a90-9f5a-d3f33cd57ef5, rgb(13, 13, 13))';
+                if (sfDiv) {
+                  sfDiv.style.setProperty('--extracted-r6o4lv', darkToken);
+                  sfDiv.style.setProperty('--framer-text-color', darkToken);
+                  sfDiv.style.color = 'rgb(13, 13, 13)';
+                }
+                if (sfP) {
+                  sfP.style.setProperty('--extracted-r6o4lv', darkToken);
+                  sfP.style.setProperty('--framer-text-color', darkToken);
+                  sfP.style.color = 'rgb(13, 13, 13)';
+                }
+              }
+            });
+          } catch (e) {}
+        }
+
+        function guardContactLink(a, rawHref) {
+          if (!rawHref) return false;
+          const lower = rawHref.toLowerCase();
+          const trimmedLower = rawHref.trim().toLowerCase();
+          if (
+            lower.includes("maps.app.goo.gl") ||
+            lower.includes("google.com/maps") ||
+            lower.includes("maps.google")
+          ) {
+            if (a.parentNode) {
+              a.parentNode.replaceChild(
+                document.createTextNode(a.textContent || "EST • GMT • PST"),
+                a
+              );
+            }
+            guardLocationTextColor();
+            return true;
+          }
+          if (
+            lower.includes("hello@forma.studio") ||
+            lower.includes("hello@formadesign.agency") ||
+            lower.includes("careers@forma.studio") ||
+            lower.includes("hello@artificer.studio") ||
+            lower.includes("prince.nkah@enraux.com") ||
+            lower.includes("contact@enraux.com")
+          ) {
+            a.setAttribute("href", "mailto:hello@enraux.com");
+            return true;
+          }
+          if (
+            lower.includes("234 567 890") ||
+            lower.includes("234567890") ||
+            lower.includes("12316604032") ||
+            lower.includes("wa.me/12316604032")
+          ) {
+            a.setAttribute("href", "https://wa.link/2c5kh8");
+            a.setAttribute("target", "_blank");
+            a.setAttribute("rel", "noopener noreferrer");
+            return true;
+          }
+          if (
+            trimmedLower === "https://www.instagram.com/" ||
+            trimmedLower === "https://www.instagram.com" ||
+            trimmedLower === "http://www.instagram.com/"
+          ) {
+            a.setAttribute("href", "https://www.instagram.com/en.raux");
+            a.setAttribute("target", "_blank");
+            a.setAttribute("rel", "noopener noreferrer");
+            return true;
+          }
+          if (
+            trimmedLower === "https://www.facebook.com/" ||
+            trimmedLower === "https://www.facebook.com" ||
+            trimmedLower === "http://www.facebook.com/"
+          ) {
+            a.setAttribute("href", "https://www.facebook.com/profile.php?id=61586291589851");
+            a.setAttribute("target", "_blank");
+            a.setAttribute("rel", "noopener noreferrer");
+            return true;
+          }
+          return false;
+        }
+
+        function replaceFormaStudioText() {
+          try {
+            const root = document.body || document.documentElement;
+            if (!root) return;
+            const walker = document.createTreeWalker(
+              root,
+              NodeFilter.SHOW_TEXT,
+              null,
+              false
+            );
+            let node;
+            while ((node = walker.nextNode())) {
+              if (
+                node.nodeValue &&
+                /contact@enraux\.com|prince\.nkah@enraux\.com|hello@forma\.studio|hello@formadesign\.agency|careers@forma\.studio|hello@artificer\.studio/i.test(
+                  node.nodeValue
+                )
+              ) {
+                node.nodeValue = node.nodeValue.replace(
+                  /contact@enraux\.com|prince\.nkah@enraux\.com|hello@forma\.studio|hello@formadesign\.agency|careers@forma\.studio|hello@artificer\.studio/gi,
+                  "hello@enraux.com"
+                );
+              }
+              if (node.nodeValue && node.nodeValue.includes("Forma Studio")) {
+                node.nodeValue = "© 2026 Enraux. All Rights Reserved.";
+              }
+              if (node.nodeValue && /3D Identity/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/3D Identity/gi, "Visual Identity");
+              }
+              if (node.nodeValue && /\$20,000\s*Flat/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/\$20,000\s*Flat/gi, "$7k+");
+              }
+              if (node.nodeValue && /\$20k\s*Full\s*Genesis/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/\$20k\s*Full\s*Genesis/gi, "$7k+ Full Genesis");
+              }
+              if (node.nodeValue && /\$20k\s*Brand\s*Genesis/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/\$20k\s*Brand\s*Genesis/gi, "$7k+ Brand Genesis");
+              }
+              if (node.nodeValue && /\$5k[–-]\$20k/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/\$5k[–-]\$20k/gi, "$7k+");
+              }
+              if (node.nodeValue && /\$20,000\s*Brand\s*Genesis/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/\$20,000\s*Brand\s*Genesis/gi, "$7k+ Brand Genesis");
+              }
+            }
+          } catch (e) {}
+        }
+
+        function normalizeAllLinks() {
+          const links = document.querySelectorAll("a");
+          links.forEach((a) => {
+            const rawHref = a.getAttribute("href");
+            if (!rawHref) return;
+
+            // Runtime guard for placeholder mailto and tel links re-hydrated by Framer
+            if (guardContactLink(a, rawHref)) {
+              return;
+            }
+
+            // Preserve external links, mailto, tel, anchors
+            if (
+              rawHref.startsWith("#") ||
+              rawHref.startsWith("mailto:") ||
+              rawHref.startsWith("tel:") ||
+              rawHref.startsWith("javascript:")
+            ) {
+              return;
+            }
+
+            // Normalize 'See All' button
+            const text = (a.textContent || "").trim();
+            if (text.includes("See All") && (rawHref === "/blog" || rawHref.includes("blog"))) {
+              if (rawHref !== "/blog") a.setAttribute("href", "/blog");
+              return;
+            }
+
+            const clean = cleanFn(rawHref);
+            if (clean && clean !== rawHref) {
+              a.setAttribute("href", clean);
+            }
+          });
+
+          // Replace text node containing 'Forma Studio' with Enraux copyright
+          replaceFormaStudioText();
+
+          // Guard light-header location text color against Framer hydration
+          guardLocationTextColor();
+        }
+
+        function normalizeLinkElement(target) {
+          const a = target && target.closest ? target.closest("a") : null;
+          if (!a) return;
+          const rawHref = a.getAttribute("href");
+          if (!rawHref) return;
+
+          // Runtime guard for placeholder mailto and tel links re-hydrated by Framer
+          if (guardContactLink(a, rawHref)) {
+            return;
+          }
+
+          // Preserve external links, mailto, tel, anchors
+          if (
+            rawHref.startsWith("#") ||
+            rawHref.startsWith("mailto:") ||
+            rawHref.startsWith("tel:") ||
+            rawHref.startsWith("javascript:")
+          ) {
+            return;
+          }
+
+          // Normalize 'See All' button
+          const text = (a.textContent || "").trim();
+          if (text.includes("See All") && (rawHref === "/blog" || rawHref.includes("blog"))) {
+            if (rawHref !== "/blog") a.setAttribute("href", "/blog");
+            return;
+          }
+
+          const clean = cleanFn(rawHref);
+          if (clean && clean !== rawHref) {
+            a.setAttribute("href", clean);
+          }
+        }
+
+        // mouseover / touchstart / click capture normalization
+        document.addEventListener("mouseover", (e) => normalizeLinkElement(e.target), true);
+        document.addEventListener("touchstart", (e) => normalizeLinkElement(e.target), { capture: true, passive: true });
+        document.addEventListener("click", (e) => {
+          normalizeLinkElement(e.target);
+          normalizeAllLinks();
+          setTimeout(normalizeAllLinks, 150);
+          setTimeout(normalizeAllLinks, 350);
+        }, true);
+
+        // Defer initial normalizeAllLinks to window load so href rewrites don't trigger pre-hydration React #418 mismatches
+        window.addEventListener("load", () => {
+          normalizeAllLinks();
+          const timer = setInterval(normalizeAllLinks, 100);
+          setTimeout(() => clearInterval(timer), 4000);
+
+          // RequestAnimationFrame-throttled childList observer active during initial hydration window (5000ms)
+          let pendingNormalize = false;
+          const linkObserver = new MutationObserver(() => {
+            if (pendingNormalize) return;
+            pendingNormalize = true;
+            requestAnimationFrame(() => {
+              pendingNormalize = false;
+              normalizeAllLinks();
+            });
+          });
+
+          linkObserver.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
+
+          setTimeout(() => {
+            linkObserver.disconnect();
+          }, 5000);
+        });
+        window.addEventListener("pageshow", normalizeAllLinks);
+      })();
+    </script>
+
+    <!-- Safe, Butter-Smooth Scroll & Load Entrance Animation (Layout-Preserving & Navbar-Shielded) -->
+    <script is:inline>
+      (() => {
+        const selector = [
+          "h1", "h2", "h3", "h4", "h5", "h6",
+          "[data-framer-name*='Card']", "[data-framer-name*='card']",
+          "[data-framer-component-type='RichTextContainer']",
+          "section",
+          ".framer-card",
+          "img",
+          "[data-framer-background-image-wrapper]"
+        ].join(", ");
+
+        const animatedSet = new WeakSet();
+
+        // 1. Strictly Cancel & Shield Navbar Animations
+        function cancelNavbarAnimations() {
+          const navElements = document.querySelectorAll(
+            "nav, [data-framer-name*='Nav' i], [data-framer-name*='Header' i], .framer-stbjvl-container, .framer-1kmos2s-container, nav *, [data-framer-name*='Nav' i] *, [data-framer-name*='Header' i] *, .framer-stbjvl-container *, .framer-1kmos2s-container *"
+          );
+          navElements.forEach((navEl) => {
+            animatedSet.add(navEl);
+            if (typeof navEl.getAnimations === "function") {
+              navEl.getAnimations().forEach((anim) => anim.cancel());
+            }
+          });
+        }
+
+        // Strict Exclusion Check: skip any Navbar element, descendant, parent wrapper, or top navbar zone
+        function isNavbarExcluded(el) {
+          if (!el || el.nodeType !== 1) return true;
+          if (el.tagName === "BODY" || el.tagName === "HTML" || el.id === "main") return true;
+
+          // 1. Closest nav/header/menu or navbar containers
+          if (
+            el.closest(
+              'nav, [data-framer-name*="Nav" i], [data-framer-name*="Header" i], .framer-stbjvl-container, .framer-1kmos2s-container'
+            )
+          ) {
+            return true;
+          }
+
+          // 2. Parent wrapper that contains the Navbar
+          if (
+            el.querySelector &&
+            el.querySelector('nav, [data-framer-name*="Nav" i], .framer-stbjvl-container, .framer-1kmos2s-container')
+          ) {
+            return true;
+          }
+
+          // 3. Top navbar zone
+          try {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < 120 && el.offsetHeight < 140) {
+              return true;
+            }
+          } catch (e) {}
+
+          // 4. Exclude Hero Service Tags bar (.framer-21z1vs), Footer (.framer-gUICt), and any Framer native appear-animation containers/children
+          if (
+            el.closest(".framer-21z1vs") ||
+            el.closest(".framer-gUICt") ||
+            el.hasAttribute("data-framer-appear-id") ||
+            el.closest("[data-framer-appear-id]")
+          ) {
+            return true;
+          }
+
+          // 5. Exclude any element inside an <a> or <button> so button icons & labels never detach
+          if (el.closest("a, button")) {
+            return true;
+          }
+
+          // 6. Exclude any h1–h6 or img inside a RichTextContainer or Card that is already being animated
+          if (
+            el.parentElement?.closest(
+              "[data-framer-component-type='RichTextContainer'], [data-framer-name*='Card' i], .framer-card"
+            )
+          ) {
+            return true;
+          }
+
+          return false;
+        }
+
+        function animateElement(el) {
+          if (!el || animatedSet.has(el)) return;
+          if (el.closest('nav, [data-framer-name*="Nav" i], [data-framer-name*="Header" i]')) return;
+          animatedSet.add(el);
+
+          // Strictly skip navbar, its descendants, its ancestors, and the top navbar zone
+          if (isNavbarExcluded(el)) {
+            if (typeof el.getAnimations === "function") {
+              el.getAnimations().forEach((anim) => anim.cancel());
+            }
+            return;
+          }
+
+          const style = window.getComputedStyle(el);
+          if (
+            style.position === "fixed" ||
+            style.display === "none" ||
+            style.visibility === "hidden"
+          ) {
+            return;
+          }
+
+          // Strict Safety Rule:
+          // ONLY animate transform: translateY(22px) -> translateY(0) on elements where
+          // window.getComputedStyle(el).transform === 'none' and position !== 'fixed'
+          const currentTransform = style.transform;
+          const hasNoTransform =
+            !currentTransform ||
+            currentTransform === "none" ||
+            currentTransform === "matrix(1, 0, 0, 1, 0, 0)";
+          const canAnimateTranslate = hasNoTransform && style.position !== "fixed";
+
+          if (canAnimateTranslate) {
+            el.animate(
+              [
+                { opacity: 0, transform: "translateY(22px)" },
+                { opacity: 1, transform: "translateY(0)" }
+              ],
+              {
+                duration: 650,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                fill: "both"
+              }
+            );
+          } else {
+            // If an element already has a Framer transform, animate opacity only!
+            el.animate(
+              [
+                { opacity: 0 },
+                { opacity: 1 }
+              ],
+              {
+                duration: 650,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                fill: "both"
+              }
+            );
+          }
+        }
+
+        function initEntranceAnimations() {
+          cancelNavbarAnimations();
+
+          if (!("IntersectionObserver" in window)) {
+            return;
+          }
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  observer.unobserve(entry.target);
+                  if (!isNavbarExcluded(entry.target)) {
+                    animateElement(entry.target);
+                  }
+                }
+              });
+            },
+            {
+              rootMargin: "0px 0px -40px 0px",
+              threshold: 0.05
+            }
+          );
+
+          const elements = document.querySelectorAll(selector);
+          const vh = window.innerHeight || 800;
+
+          elements.forEach((el) => {
+            if (isNavbarExcluded(el)) {
+              animatedSet.add(el);
+              if (typeof el.getAnimations === "function") {
+                el.getAnimations().forEach((anim) => anim.cancel());
+              }
+              return;
+            }
+
+            const style = window.getComputedStyle(el);
+            if (style.position === "fixed") {
+              return;
+            }
+
+            const rect = el.getBoundingClientRect();
+            // Leave initial viewport (above-the-fold) elements cleanly in place from 0ms
+            if (rect.top < vh && rect.bottom > 0) {
+              animatedSet.add(el);
+              return;
+            }
+
+            // ONLY observe below-the-fold elements as the user scrolls down
+            if (rect.top >= vh) {
+              observer.observe(el);
+            }
+          });
+        }
+
+        // Run immediately at 0ms and across all lifecycle events
+        cancelNavbarAnimations();
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initEntranceAnimations, { once: true });
+        } else {
+          initEntranceAnimations();
+        }
+        window.addEventListener("load", initEntranceAnimations, { once: true });
+        window.addEventListener("pageshow", cancelNavbarAnimations);
+
+        // Active MutationObserver guard to cancel any animations accidentally attached to Navbar
+        let navGuardPending = false;
+        const navAnimGuard = new MutationObserver((mutations) => {
+          if (navGuardPending) return;
+          const touchesNav = mutations.some((m) => {
+            const target = m.target;
+            return (
+              target &&
+              target.closest &&
+              target.closest(
+                "nav, header, [data-framer-name*='Nav' i], [data-framer-name*='Header' i], [data-framer-name*='Menu' i], .framer-stbjvl-container, .framer-1kmos2s-container"
+              )
+            );
+          });
+          if (touchesNav) {
+            navGuardPending = true;
+            requestAnimationFrame(() => {
+              navGuardPending = false;
+              cancelNavbarAnimations();
+            });
+          }
+        });
+
+        navAnimGuard.observe(document.documentElement || document.body, {
+          childList: true,
+          subtree: true,
+        });
+      })();
+    </script>
+
+    <!-- Fallback Menu Drawer Script for Static Blog Articles (#2-#8 where Framer script_main is absent) -->
+    <script is:inline>
+      (() => {
+        function initStaticMenuDrawer() {
+          const hasFramerBundle = !!document.querySelector('script[data-framer-bundle="main"]');
+          const mainEl = document.getElementById("main");
+          const hasHydrateAttr = !!(mainEl && mainEl.hasAttribute("data-framer-hydrate-v2"));
+          if (hasFramerBundle && hasHydrateAttr) {
+            return;
+          }
+
+          if (document.getElementById("enraux-static-menu-drawer")) return;
+
+          const drawer = document.createElement("div");
+          drawer.id = "enraux-static-menu-drawer";
+          drawer.setAttribute("aria-hidden", "true");
+          const isBlogPage = window.location.pathname.startsWith("/blog");
+          drawer.innerHTML = [
+            '<div class="enraux-drawer-nav" role="navigation" aria-label="Menu Navigation">',
+            '  <a class="enraux-drawer-link" href="/">Home</a>',
+            '  <a class="enraux-drawer-link" href="/about">About</a>',
+            '  <a class="enraux-drawer-link" href="/service">Service</a>',
+            '  <a class="enraux-drawer-link' + (isBlogPage ? ' is-active' : '') + '" href="/blog">Blog</a>',
+            '  <a class="enraux-drawer-link" href="/contact">Contact</a>',
+            '</div>',
+            '<div class="enraux-drawer-footer">',
+            '  <div class="enraux-drawer-footer-inner">',
+            '    <span>&copy; 2026 Enraux. All Rights Reserved.</span>',
+            '    <div class="enraux-drawer-legal">',
+            '      <a href="/terms">Terms &amp; Condition</a>',
+            '      <span>&bull;</span>',
+            '      <a href="/privacy">Privacy Policy</a>',
+            '    </div>',
+            '  </div>',
+            '</div>'
+          ].join("\n");
+          document.body.appendChild(drawer);
+
+          let isOpen = false;
+          function setMenuState(open) {
+            isOpen = open;
+            drawer.classList.toggle("is-open", open);
+            drawer.setAttribute("aria-hidden", open ? "false" : "true");
+            document.documentElement.classList.toggle("enraux-static-menu-open", open);
+            document.body.classList.toggle("enraux-static-menu-open", open);
+            document.querySelectorAll(".framer-qvIpE").forEach((icon) => {
+              icon.classList.toggle("enraux-icon-open", open);
+            });
+          }
+
+          function handleToggle(e) {
+            const trigger =
+              e.target &&
+              typeof e.target.closest === "function" &&
+              e.target.closest(".framer-r1ebey, .framer-qvIpE, .framer-1vfl530");
+            if (!trigger) return;
+            if (document.querySelector(".framer-z10Ts .framer-17nx4mu-container")) return;
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            setMenuState(!isOpen);
+          }
+
+          window.addEventListener("click", handleToggle, true);
+          window.addEventListener(
+            "keydown",
+            (e) => {
+              if (e.key === "Escape" && isOpen) {
+                setMenuState(false);
+                return;
+              }
+              if ((e.key === "Enter" || e.key === " ") && e.target) {
+                const trigger =
+                  typeof e.target.closest === "function" &&
+                  e.target.closest(".framer-r1ebey, .framer-qvIpE, .framer-1vfl530");
+                if (trigger) {
+                  handleToggle(e);
+                }
+              }
+            },
+            true
+          );
+
+          drawer.addEventListener("click", (e) => {
+            if (e.target && e.target.closest && e.target.closest("a")) {
+              setMenuState(false);
+            }
+          });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initStaticMenuDrawer);
+        } else {
+          initStaticMenuDrawer();
+        }
+      })();
+    </script>
+
+  </body>
+</html>
