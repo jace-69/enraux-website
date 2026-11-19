@@ -563,6 +563,43 @@ const {
         --framer-text-alignment: center !important;
         text-align: center !important;
       }
+
+      /* 6. Custom Desktop Translucent Cursor System */
+      @media (hover: hover) and (pointer: fine) {
+        html.enraux-custom-cursor,
+        html.enraux-custom-cursor *,
+        html.enraux-custom-cursor [class],
+        html.enraux-custom-cursor [class] * {
+          cursor: none !important;
+        }
+      }
+      #enraux-cursor {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 24px !important;
+        height: 24px !important;
+        margin-left: -12px !important;
+        margin-top: -12px !important;
+        border-radius: 9999px !important;
+        background: rgba(128, 128, 134, 0.38) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.32) !important;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.14) !important;
+        backdrop-filter: blur(2px) !important;
+        -webkit-backdrop-filter: blur(2px) !important;
+        pointer-events: none !important;
+        z-index: 2147483647 !important;
+        opacity: 0;
+        will-change: transform, opacity;
+        transition: opacity 0.18s ease, width 0.16s ease, height 0.16s ease, margin 0.16s ease, background-color 0.16s ease;
+        transform: translate3d(-100px, -100px, 0) scale(1);
+      }
+      #enraux-cursor.is-visible {
+        opacity: 1;
+      }
+      #enraux-cursor.is-hover {
+        background: rgba(128, 128, 134, 0.46) !important;
+      }
     </style>
 
     <!-- Block Framer Editorbar Module Loading via Import Map -->
@@ -2987,6 +3024,122 @@ const {
           } catch (e) {}
         }
 
+        function guardLegalPages() {
+          try {
+            const currentPath = (window.location.pathname || "").replace(/\/+$/, "") || "/";
+            if (currentPath !== "/terms" && currentPath !== "/privacy") return;
+
+            const root = document.body || document.documentElement;
+            if (!root) return;
+
+            // 1. Guard Date text node: replace "Last updated: 01 Dec 2026" or any older date with "Last updated: 19 Nov 2026"
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while ((node = walker.nextNode())) {
+              if (node.nodeValue && /Last updated:/i.test(node.nodeValue)) {
+                if (!node.nodeValue.includes("19 Nov 2026")) {
+                  node.nodeValue = node.nodeValue.replace(/Last updated:\s*.*$/i, "Last updated: 19 Nov 2026");
+                }
+              }
+            }
+
+            // 2. Guard Section 14 (terms) / Section 12 (privacy) Contact phone link inside #main (explicitly excluding .framer-gUICt footer)
+            const mainEl = document.getElementById("main");
+            if (mainEl) {
+              const waLinks = mainEl.querySelectorAll('a[href*="wa.link/2c5kh8"]');
+              waLinks.forEach((a) => {
+                if (a.closest(".framer-gUICt")) return;
+                const trimmed = (a.textContent || "").trim();
+                if (trimmed === "+1 (231) 660-4032") {
+                  a.textContent = "+1 (231) 660-4032 (WhatsApp only)";
+                }
+              });
+            }
+
+            // 3. On /terms: Section 4 first bullet pricing tiers
+            if (currentPath === "/terms") {
+              const fullTierText = "Landing Page Sprints ($900+) & Custom Projects (Multi-Page Sites from $2,500+, SaaS/Mobile Apps from $5,000+, High-Scale E-Commerce from $7,500+, and Brand Genesis from $7,000+): Billed via an initial kickoff deposit or structured milestone payments as defined in the agreement.";
+              const termsWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+              let tNode;
+              while ((tNode = termsWalker.nextNode())) {
+                if (
+                  tNode.nodeValue &&
+                  tNode.nodeValue.includes("Landing Page Sprints ($900+) & Custom Projects: Billed via")
+                ) {
+                  tNode.nodeValue = fullTierText;
+                }
+              }
+            }
+
+            // 4. On /privacy: Section 1 & Section 4 lists
+            if (currentPath === "/privacy") {
+              const updatedBullet1 = "Name, email address, country code, WhatsApp number, selected service, and project details when you submit a contact form or book a call";
+              const rosterBulletText = "Name, location/timezone, WhatsApp number, Discord handle (if provided), and portfolio links when applying to join the Enraux Routing Roster via email";
+
+              const privacyWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+              let pNode;
+              let bullet1Node = null;
+              while ((pNode = privacyWalker.nextNode())) {
+                if (pNode.nodeValue && pNode.nodeValue.includes("Name, email address, and phone/WhatsApp number when you inquire or book a call")) {
+                  pNode.nodeValue = updatedBullet1;
+                  bullet1Node = pNode;
+                } else if (pNode.nodeValue && pNode.nodeValue.includes(updatedBullet1)) {
+                  bullet1Node = pNode;
+                }
+              }
+
+              // Ensure Routing Roster bullet is present in Section 1
+              const docText = root.textContent || "";
+              if (!docText.includes("applying to join the Enraux Routing Roster via email")) {
+                if (bullet1Node) {
+                  const bullet1Wrap = bullet1Node.parentElement ? bullet1Node.parentElement.closest(".ssr-variant") : null;
+                  if (bullet1Wrap && bullet1Wrap.parentNode) {
+                    const clone = bullet1Wrap.cloneNode(true);
+                    const p = clone.querySelector("p");
+                    if (p) p.textContent = rosterBulletText;
+                    bullet1Wrap.parentNode.insertBefore(clone, bullet1Wrap.nextSibling);
+                  }
+                }
+              }
+
+              // Ensure Section 4 live infrastructure and intake items are present
+              const thirdPartyItems = [
+                "Cloudflare — edge hosting, static asset delivery, Workers API, security, and email routing",
+                "Supabase — encrypted lead and inquiry database storage",
+                "Resend — transactional lead alert and confirmation emails",
+                "Google Sheets (Google Workspace) — internal lead logging and workflow tracking",
+                "WhatsApp — direct client messaging and support (+1 (231) 660-4032)"
+              ];
+
+              const allVariants = Array.from(document.querySelectorAll(".ssr-variant"));
+              let gWorkspaceWrap = null;
+              for (let i = 0; i < allVariants.length; i++) {
+                if ((allVariants[i].textContent || "").includes("Google Workspace — email and secure file management")) {
+                  gWorkspaceWrap = allVariants[i];
+                  break;
+                }
+              }
+
+              if (gWorkspaceWrap && gWorkspaceWrap.parentNode) {
+                let insertTarget = gWorkspaceWrap;
+                thirdPartyItems.forEach((itemText) => {
+                  const curText = (document.body || document.documentElement).textContent || "";
+                  if (!curText.includes(itemText)) {
+                    const clone = gWorkspaceWrap.cloneNode(true);
+                    const p = clone.querySelector("p");
+                    if (p) p.textContent = itemText;
+                    insertTarget.parentNode.insertBefore(clone, insertTarget.nextSibling);
+                    insertTarget = clone;
+                  } else {
+                    const existing = Array.from(document.querySelectorAll(".ssr-variant")).find((el) => (el.textContent || "").includes(itemText));
+                    if (existing) insertTarget = existing;
+                  }
+                });
+              }
+            }
+          } catch (e) {}
+        }
+
         function normalizeAllLinks() {
           const links = document.querySelectorAll("a");
           links.forEach((a) => {
@@ -3044,6 +3197,9 @@ const {
 
           // Guard light-header location text color against Framer hydration
           guardLocationTextColor();
+
+          // Guard legal pages (terms & privacy) against Framer hydration
+          guardLegalPages();
 
           // Purge any re-injected Framer CDN favicons
           try {
@@ -3145,7 +3301,12 @@ const {
             linkObserver.disconnect();
           }, 5000);
         });
-        window.addEventListener("pageshow", normalizeAllLinks);
+        guardLegalPages();
+        document.addEventListener("DOMContentLoaded", guardLegalPages);
+        window.addEventListener("pageshow", () => {
+          normalizeAllLinks();
+          guardLegalPages();
+        });
       })();
     </script>
 
@@ -3672,6 +3833,223 @@ const {
           scheduleHeroCheck();
         }
         window.addEventListener("load", scheduleHeroCheck);
+      })();
+    </script>
+
+    <!-- Smooth Desktop Translucent Cursor System -->
+    <script is:inline>
+      (() => {
+        if (typeof window === "undefined" || !window.matchMedia) return;
+
+        const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+        let cursorEl = null;
+        let rafId = null;
+        let isVisible = false;
+        let isHovered = false;
+        let isPressed = false;
+        let curX = -100;
+        let curY = -100;
+        let targetX = -100;
+        let targetY = -100;
+        let curScale = 1;
+        let isAttached = false;
+
+        const INTERACTIVE_SELECTOR =
+          "a, button, select, input, textarea, label, [role='button'], [role='link'], .framer-r1ebey, .framer-qvIpE, .framer-upW4V, .framer-0WrPu, .framer-l6xzuo, .framer-QgsVx";
+
+        function updateHover(target) {
+          const interactive = !!(
+            target &&
+            typeof target.closest === "function" &&
+            target.closest(INTERACTIVE_SELECTOR)
+          );
+          if (isHovered !== interactive) {
+            isHovered = interactive;
+            if (cursorEl) {
+              if (isHovered) {
+                cursorEl.classList.add("is-hover");
+              } else {
+                cursorEl.classList.remove("is-hover");
+              }
+            }
+          }
+        }
+
+        function onPointerMove(e) {
+          if (e.pointerType === "touch") return;
+          targetX = e.clientX;
+          targetY = e.clientY;
+
+          if (!isVisible) {
+            isVisible = true;
+            curX = targetX;
+            curY = targetY;
+            curScale = isPressed ? 0.82 : isHovered ? 1.22 : 1;
+            if (cursorEl) cursorEl.classList.add("is-visible");
+          }
+
+          updateHover(e.target);
+
+          if (!rafId) {
+            rafId = requestAnimationFrame(render);
+          }
+        }
+
+        function onPointerDown(e) {
+          if (e.pointerType === "touch") return;
+          isPressed = true;
+          updateHover(e.target);
+          if (!rafId && isVisible) {
+            rafId = requestAnimationFrame(render);
+          }
+        }
+
+        function onPointerUp(e) {
+          if (e.pointerType === "touch") return;
+          isPressed = false;
+          updateHover(e.target);
+          if (!rafId && isVisible) {
+            rafId = requestAnimationFrame(render);
+          }
+        }
+
+        function onScroll() {
+          if (!isVisible) return;
+          try {
+            const el = document.elementFromPoint(targetX, targetY);
+            if (el) updateHover(el);
+          } catch {}
+        }
+
+        function hideCursor() {
+          isVisible = false;
+          isPressed = false;
+          isHovered = false;
+          if (cursorEl) {
+            cursorEl.classList.remove("is-visible", "is-hover");
+          }
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        }
+
+        function render() {
+          if (!isVisible) {
+            rafId = null;
+            return;
+          }
+
+          const LERP = 0.42;
+          const dx = targetX - curX;
+          const dy = targetY - curY;
+
+          if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) {
+            curX = targetX;
+            curY = targetY;
+          } else {
+            curX += dx * LERP;
+            curY += dy * LERP;
+          }
+
+          const nextTargetScale = isPressed ? 0.82 : isHovered ? 1.22 : 1;
+          const ds = nextTargetScale - curScale;
+          if (Math.abs(ds) < 0.005) {
+            curScale = nextTargetScale;
+          } else {
+            curScale += ds * 0.28;
+          }
+
+          if (cursorEl) {
+            cursorEl.style.transform =
+              "translate3d(" +
+              curX.toFixed(2) +
+              "px, " +
+              curY.toFixed(2) +
+              "px, 0) scale(" +
+              curScale.toFixed(3) +
+              ")";
+          }
+
+          rafId = requestAnimationFrame(render);
+        }
+
+        function activate() {
+          if (isAttached) return;
+          if (!mediaQuery || !mediaQuery.matches) return;
+
+          cursorEl = document.getElementById("enraux-cursor");
+          if (!cursorEl) {
+            cursorEl = document.createElement("div");
+            cursorEl.id = "enraux-cursor";
+            cursorEl.setAttribute("aria-hidden", "true");
+            document.documentElement.appendChild(cursorEl);
+          }
+
+          document.documentElement.classList.add("enraux-custom-cursor");
+
+          const moveEvt = window.PointerEvent ? "pointermove" : "mousemove";
+          const downEvt = window.PointerEvent ? "pointerdown" : "mousedown";
+          const upEvt = window.PointerEvent ? "pointerup" : "mouseup";
+
+          window.addEventListener(moveEvt, onPointerMove, { passive: true });
+          window.addEventListener(downEvt, onPointerDown, { passive: true });
+          window.addEventListener(upEvt, onPointerUp, { passive: true });
+          window.addEventListener("scroll", onScroll, { passive: true });
+          document.addEventListener("mouseleave", hideCursor);
+          window.addEventListener("blur", hideCursor);
+
+          isAttached = true;
+        }
+
+        function deactivate() {
+          if (!isAttached) return;
+
+          const moveEvt = window.PointerEvent ? "pointermove" : "mousemove";
+          const downEvt = window.PointerEvent ? "pointerdown" : "mousedown";
+          const upEvt = window.PointerEvent ? "pointerup" : "mouseup";
+
+          window.removeEventListener(moveEvt, onPointerMove);
+          window.removeEventListener(downEvt, onPointerDown);
+          window.removeEventListener(upEvt, onPointerUp);
+          window.removeEventListener("scroll", onScroll);
+          document.removeEventListener("mouseleave", hideCursor);
+          window.removeEventListener("blur", hideCursor);
+
+          hideCursor();
+
+          document.documentElement.classList.remove("enraux-custom-cursor");
+
+          if (cursorEl && cursorEl.parentNode) {
+            cursorEl.parentNode.removeChild(cursorEl);
+            cursorEl = null;
+          }
+
+          isAttached = false;
+        }
+
+        function handleMediaChange(e) {
+          if (e.matches) {
+            activate();
+          } else {
+            deactivate();
+          }
+        }
+
+        if (mediaQuery.addEventListener) {
+          mediaQuery.addEventListener("change", handleMediaChange);
+        } else if (mediaQuery.addListener) {
+          mediaQuery.addListener(handleMediaChange);
+        }
+
+        if (mediaQuery.matches) {
+          if (document.documentElement) {
+            activate();
+          } else {
+            document.addEventListener("DOMContentLoaded", activate);
+          }
+        }
       })();
     </script>
 
