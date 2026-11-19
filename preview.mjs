@@ -2,7 +2,7 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 
-const PORT = 4322;
+const PORT = process.env.PORT || 4322;
 
 // Helper to escape HTML characters before constructing email templates
 function escapeHtml(str) {
@@ -379,8 +379,9 @@ ${message}
     }
 
     // Serve extracted CSS files from public/styles/
-    if (reqUrl.startsWith("/styles/")) {
-      const cssPath = path.join("public", reqUrl);
+    const reqPathOnly = reqUrl.split("?")[0];
+    if (reqPathOnly.startsWith("/styles/")) {
+      const cssPath = path.join("public", reqPathOnly);
       if (fs.existsSync(cssPath)) {
         res.writeHead(200, {
           "Content-Type": "text/css; charset=utf-8",
@@ -391,7 +392,7 @@ ${message}
     }
 
     // Serve static assets from public/ if present
-    const publicPath = path.join("public", reqUrl.replace(/^\/+/, ""));
+    const publicPath = path.join("public", reqPathOnly.replace(/^\/+/, ""));
     if (fs.existsSync(publicPath) && fs.statSync(publicPath).isFile()) {
       const ext = path.extname(publicPath).toLowerCase();
       const mimeTypes = {
@@ -444,13 +445,16 @@ ${message}
     if (astroFile && fs.existsSync(astroFile)) {
       const content = fs.readFileSync(astroFile, "utf-8");
       const title = (content.match(/title="([^"]*)"/) || [])[1] || "Enraux";
+      const description =
+        (content.match(/description="([^"]*)"/) || [])[1] ||
+        "Enraux engineers high-converting landing pages, visual identity, and monthly ad creatives that turn cold clicks into profitable revenue.";
       const cssFile = (content.match(/cssFile="([^"]*)"/) || [])[1] || "";
       const bodyClass = (content.match(/bodyClass="([^"]*)"/) || [])[1] || "";
 
       // Synchronously inline page CSS to eliminate white flashes and any 600ms navbar shifts
       let inlineStyleTag = "";
       if (cssFile) {
-        const cssDiskPath = path.join("public", cssFile.replace(/^\/+/, ""));
+        const cssDiskPath = path.join("public", cssFile.split("?")[0].replace(/^\/+/, ""));
         if (fs.existsSync(cssDiskPath)) {
           const cssContent = fs.readFileSync(cssDiskPath, "utf-8");
           inlineStyleTag = `<style id="enraux-inlined-page-css">\n${cssContent}\n</style>`;
@@ -468,6 +472,8 @@ ${message}
       // Use function replacers so JavaScript never interprets $& or $' in minified CSS or slots
       let renderedHtml = baseTemplate
         .replace("{title}", () => title)
+        .replace("content={description}", () => `content="${escapeHtml(description)}"`)
+        .replace('href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`}', () => `href="${cssFile}"`)
         .replace("href={cssFile}", () => `href="${cssFile}"`)
         .replace("class={bodyClass}", () => `class="${bodyClass}"`)
         .replace('<slot name="head" />', () => headSlot)

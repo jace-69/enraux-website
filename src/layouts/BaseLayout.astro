@@ -1,12 +1,14 @@
 ---
 interface Props {
   title?: string;
+  description?: string;
   cssFile?: string;
   bodyClass?: string;
 }
 
 const {
   title = "Enraux Studio",
+  description = "Enraux engineers high-converting landing pages, visual identity, and monthly ad creatives that turn cold clicks into profitable revenue.",
   cssFile = "/styles/index.css",
   bodyClass = "",
 } = Astro.props;
@@ -16,11 +18,14 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://framerusercontent.com" crossorigin />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" />
-    <link rel="stylesheet" href={cssFile} />
+    <link rel="stylesheet" href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`} />
 
     <style is:global>
       /* 1. Canvas Lock & Framer Stacked Scale-Back View Transition */
@@ -600,6 +605,12 @@ const {
       #enraux-cursor.is-hover {
         background: rgba(128, 128, 134, 0.46) !important;
       }
+
+      /* Immediate Hero LCP CSS */
+      .framer-208ybr .framer-18b7vvs {
+        opacity: 1 !important;
+        transform: none !important;
+      }
     </style>
 
     <!-- Block Framer Editorbar Module Loading via Import Map -->
@@ -752,12 +763,6 @@ const {
             } catch {
               window.scrollTo(0, 0);
             }
-            if (document.documentElement) {
-              document.documentElement.scrollTop = 0;
-            }
-            if (document.body) {
-              document.body.scrollTop = 0;
-            }
             if (window.lenis && typeof window.lenis.scrollTo === "function") {
               try {
                 window.lenis.scrollTo(0, { immediate: true });
@@ -766,16 +771,10 @@ const {
           }
         }
 
-        resetScrollToTop();
-        setTimeout(resetScrollToTop, 50);
-        setTimeout(resetScrollToTop, 150);
-
         // Reset state on pageshow/pagehide (e.g. browser back/forward navigation)
-        window.addEventListener("pageshow", () => {
+        window.addEventListener("pageshow", (e) => {
           isNavigating = false;
-          resetScrollToTop();
-          setTimeout(resetScrollToTop, 50);
-          setTimeout(resetScrollToTop, 150);
+          if (e.persisted && !window.location.hash) requestAnimationFrame(resetScrollToTop);
         });
         window.addEventListener("pagehide", () => {
           isNavigating = false;
@@ -3360,15 +3359,7 @@ const {
             return true;
           }
 
-          // 3. Top navbar zone
-          try {
-            const rect = el.getBoundingClientRect();
-            if (rect.top < 120 && el.offsetHeight < 140) {
-              return true;
-            }
-          } catch (e) {}
-
-          // 4. Exclude Hero Service Tags bar (.framer-21z1vs), Footer (.framer-gUICt), and any Framer native appear-animation containers/children
+          // 3. Exclude Hero Service Tags bar (.framer-21z1vs), Footer (.framer-gUICt), and any Framer native appear-animation containers/children
           if (
             el.closest(".framer-21z1vs") ||
             el.closest(".framer-gUICt") ||
@@ -3464,11 +3455,31 @@ const {
 
           const observer = new IntersectionObserver(
             (entries) => {
+              const vh = window.innerHeight || 800;
               entries.forEach((entry) => {
+                const el = entry.target;
+                if (!el || animatedSet.has(el)) {
+                  observer.unobserve(el);
+                  return;
+                }
+
+                // Initial observation batch (above-the-fold elements cleanly stay in place)
+                if (entry.boundingClientRect.top < vh && entry.boundingClientRect.bottom > 0) {
+                  animatedSet.add(el);
+                  observer.unobserve(el);
+                  return;
+                }
+
+                // Otherwise, when entry.isIntersecting
                 if (entry.isIntersecting) {
-                  observer.unobserve(entry.target);
-                  if (!isNavbarExcluded(entry.target)) {
-                    animateElement(entry.target);
+                  observer.unobserve(el);
+                  if (isNavbarExcluded(el)) {
+                    animatedSet.add(el);
+                    return;
+                  }
+                  const style = window.getComputedStyle(el);
+                  if (style.position !== "fixed") {
+                    animateElement(el);
                   }
                 }
               });
@@ -3480,8 +3491,6 @@ const {
           );
 
           const elements = document.querySelectorAll(selector);
-          const vh = window.innerHeight || 800;
-
           elements.forEach((el) => {
             if (isNavbarExcluded(el)) {
               animatedSet.add(el);
@@ -3490,34 +3499,23 @@ const {
               }
               return;
             }
-
-            const style = window.getComputedStyle(el);
-            if (style.position === "fixed") {
-              return;
-            }
-
-            const rect = el.getBoundingClientRect();
-            // Leave initial viewport (above-the-fold) elements cleanly in place from 0ms
-            if (rect.top < vh && rect.bottom > 0) {
-              animatedSet.add(el);
-              return;
-            }
-
-            // ONLY observe below-the-fold elements as the user scrolls down
-            if (rect.top >= vh) {
-              observer.observe(el);
-            }
+            observer.observe(el);
           });
         }
 
-        // Run immediately at 0ms and across all lifecycle events
+        // Schedule entrance animations safely without synchronous layout loops
         cancelNavbarAnimations();
         if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initEntranceAnimations, { once: true });
+          document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+              requestAnimationFrame(initEntranceAnimations);
+            },
+            { once: true }
+          );
         } else {
-          initEntranceAnimations();
+          requestAnimationFrame(initEntranceAnimations);
         }
-        window.addEventListener("load", initEntranceAnimations, { once: true });
         window.addEventListener("pageshow", cancelNavbarAnimations);
 
         // Active MutationObserver guard to cancel any animations accidentally attached to Navbar
@@ -4053,5 +4051,62 @@ const {
       })();
     </script>
 
+    <!-- Fix Framer Badge Container / React Error #405 -->
+    <div id="__framer-badge-container" hidden aria-hidden="true"></div>
+
+    <!-- Heading Order Accessibility Normalizer (Hydration-Safe) -->
+    <script is:inline>
+      (() => {
+        function normalizeHeadingAriaLevels() {
+          const main = document.getElementById("main");
+          if (!main) return;
+
+          // 1. Target h4 presets -> aria-level="3"
+          document
+            .querySelectorAll('h4[data-styles-preset="n2uRo24qe"], h4.framer-styles-preset-1v423ef')
+            .forEach((el) => {
+              el.setAttribute("aria-level", "3");
+            });
+
+          // 2. Target h5 headings:
+          // "Book a Discovery Call" -> aria-level="3"
+          // Service titles (.framer-NNi4D h5 or h5 inside service blocks, excluding "Book a Discovery Call") -> aria-level="4"
+          document.querySelectorAll("h5").forEach((el) => {
+            const text = el.textContent || "";
+            if (text.includes("Book a Discovery Call")) {
+              el.setAttribute("aria-level", "3");
+            } else if (el.closest(".framer-NNi4D, [data-framer-name*='Service' i]")) {
+              el.setAttribute("aria-level", "4");
+            }
+          });
+
+          // 3. Footer h6 (footer h6, .framer-gUICt h6, h6.framer-styles-preset-r8tk6t) -> aria-level="3"
+          const footerHeadings = new Set();
+          document
+            .querySelectorAll("footer h6, .framer-gUICt h6, h6.framer-styles-preset-r8tk6t")
+            .forEach((el) => {
+              footerHeadings.add(el);
+              el.setAttribute("aria-level", "3");
+            });
+
+          // 4. FAQ items (.framer-1e374s0 h6 or h6 before the footer, excluding footer headings) -> aria-level="5"
+          document
+            .querySelectorAll(".framer-1e374s0 h6, #main h6")
+            .forEach((el) => {
+              if (!footerHeadings.has(el) && !el.closest("footer, .framer-gUICt")) {
+                el.setAttribute("aria-level", "5");
+              }
+            });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", normalizeHeadingAriaLevels);
+        } else {
+          normalizeHeadingAriaLevels();
+        }
+        window.addEventListener("load", normalizeHeadingAriaLevels);
+        setTimeout(normalizeHeadingAriaLevels, 600);
+      })();
+    </script>
   </body>
 </html>
