@@ -553,6 +553,13 @@ const {
       .framer-KtiaD .framer-l6xzuo {
         cursor: pointer !important;
       }
+
+      /* Career Hero Heading Center Alignment */
+      .framer-16yKI .framer-1fatpkw .framer-8vovdw h1,
+      .framer-16yKI .framer-1fatpkw .framer-1ldoz58 h1 {
+        --framer-text-alignment: center !important;
+        text-align: center !important;
+      }
     </style>
 
     <!-- Block Framer Editorbar Module Loading via Import Map -->
@@ -872,6 +879,40 @@ const {
         }
         window.__getPricingCardTarget = getPricingCardTarget;
 
+        // Career Routing Roster mailto helper
+        function getCareerMailtoHref(a) {
+          if (!a) return null;
+          const className = a.className || "";
+          const text = (a.textContent || "").replace(/\s+/g, " ").trim();
+          const isCareerCard =
+            (typeof className === "string" && className.includes("framer-QgsVx")) ||
+            text.includes("Join Routing Roster");
+          if (!isCareerCard) return null;
+
+          let role = "Enraux Partner Network";
+          if (text.includes("Framer UI") || text.includes("Frontend Builder")) {
+            role = "Framer UI & Astro Frontend Builder";
+          } else if (text.includes("Paid Social Ad") || text.includes("Motion Designer")) {
+            role = "Paid Social Ad & Motion Designer";
+          } else if (text.includes("Outbound Partner") || text.includes("Deal Closer")) {
+            role = "Outbound Partner & Deal Closer";
+          }
+
+          const subject = "Enraux Routing Roster Application — " + role;
+          const body =
+            "Hi Enraux Team,\r\n\r\n" +
+            "I'd like to join the Enraux Routing Roster for: " + role + "\r\n\r\n" +
+            "Name:\r\n" +
+            "Location (City / Timezone):\r\n" +
+            "Phone Number (WhatsApp):\r\n" +
+            "Discord Handle (if on Discord):\r\n" +
+            "Portfolio / Links / Experience:\r\n\r\n" +
+            "Best,";
+
+          return "mailto:hello@enraux.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        }
+        window.__getCareerMailtoHref = getCareerMailtoHref;
+
         function setPricingButtonsRole() {
           const buttons = document.querySelectorAll(
             ".framer-KtiaD .framer-yicckt-container .framer-l6xzuo"
@@ -1008,6 +1049,64 @@ const {
           true
         );
 
+        // Career Card CTA Button Interceptor (synchronous window capture phase)
+        window.addEventListener(
+          "click",
+          (e) => {
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            const a = e.target && e.target.closest ? e.target.closest("a") : null;
+            if (!a) return;
+
+            const careerMailto =
+              typeof window.__getCareerMailtoHref === "function"
+                ? window.__getCareerMailtoHref(a)
+                : typeof getCareerMailtoHref === "function"
+                ? getCareerMailtoHref(a)
+                : null;
+            if (!careerMailto) return;
+
+            a.setAttribute("href", careerMailto);
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+
+            try {
+              window.location.href = careerMailto;
+            } catch {}
+            return;
+          },
+          true
+        );
+
+        // Career Card CTA Keyboard Interceptor (Enter key in window capture phase)
+        window.addEventListener(
+          "keydown",
+          (e) => {
+            if (e.key !== "Enter") return;
+            const a = e.target && e.target.closest ? e.target.closest("a") : null;
+            if (!a) return;
+
+            const careerMailto =
+              typeof window.__getCareerMailtoHref === "function"
+                ? window.__getCareerMailtoHref(a)
+                : typeof getCareerMailtoHref === "function"
+                ? getCareerMailtoHref(a)
+                : null;
+            if (!careerMailto) return;
+
+            a.setAttribute("href", careerMailto);
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+
+            try {
+              window.location.href = careerMailto;
+            } catch {}
+            return;
+          },
+          true
+        );
+
         document.addEventListener(
           "click",
           (e) => {
@@ -1028,6 +1127,19 @@ const {
 
             const rawHref = a.getAttribute("href");
             if (!rawHref) return;
+
+            // Career Routing Roster mailto interceptor
+            const careerMailto = getCareerMailtoHref(a);
+            if (careerMailto) {
+              a.setAttribute("href", careerMailto);
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              e.stopPropagation();
+              try {
+                window.location.href = careerMailto;
+              } catch {}
+              return;
+            }
 
             if (
               rawHref.startsWith("#") ||
@@ -2725,6 +2837,13 @@ const {
 
         function guardContactLink(a, rawHref) {
           if (!rawHref) return false;
+          const careerMailto = typeof window.__getCareerMailtoHref === "function" ? window.__getCareerMailtoHref(a) : (typeof getCareerMailtoHref === "function" ? getCareerMailtoHref(a) : null);
+          if (careerMailto) {
+            if (a.getAttribute("href") !== careerMailto) {
+              a.setAttribute("href", careerMailto);
+            }
+            return true;
+          }
           const lower = rawHref.toLowerCase();
           const trimmedLower = rawHref.trim().toLowerCase();
           if (
@@ -2871,6 +2990,15 @@ const {
             const rawHref = a.getAttribute("href");
             if (!rawHref) return;
 
+            // Career Routing Roster mailto guard
+            const careerMailto = typeof window.__getCareerMailtoHref === "function" ? window.__getCareerMailtoHref(a) : (typeof getCareerMailtoHref === "function" ? getCareerMailtoHref(a) : null);
+            if (careerMailto) {
+              if (a.getAttribute("href") !== careerMailto) {
+                a.setAttribute("href", careerMailto);
+              }
+              return;
+            }
+
             // Runtime guard for placeholder mailto and tel links re-hydrated by Framer
             if (guardContactLink(a, rawHref)) {
               return;
@@ -2930,6 +3058,15 @@ const {
           if (!a) return;
           const rawHref = a.getAttribute("href");
           if (!rawHref) return;
+
+          // Career Routing Roster mailto guard
+          const careerMailto = typeof window.__getCareerMailtoHref === "function" ? window.__getCareerMailtoHref(a) : (typeof getCareerMailtoHref === "function" ? getCareerMailtoHref(a) : null);
+          if (careerMailto) {
+            if (a.getAttribute("href") !== careerMailto) {
+              a.setAttribute("href", careerMailto);
+            }
+            return;
+          }
 
           // Runtime guard for placeholder mailto and tel links re-hydrated by Framer
           if (guardContactLink(a, rawHref)) {
