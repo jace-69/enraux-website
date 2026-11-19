@@ -590,8 +590,6 @@ const {
         background: rgba(128, 128, 134, 0.38) !important;
         border: 1.5px solid rgba(255, 255, 255, 0.32) !important;
         box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.14) !important;
-        backdrop-filter: blur(2px) !important;
-        -webkit-backdrop-filter: blur(2px) !important;
         pointer-events: none !important;
         z-index: 2147483647 !important;
         opacity: 0;
@@ -1247,6 +1245,49 @@ const {
   <body class={bodyClass}>
     <slot />
 
+    <!-- Hydration State Detector & Task Scheduler -->
+    <script is:inline>
+      (() => {
+        window.__enrauxWhenHydrated = function (fn) {
+          if (typeof fn !== "function") return;
+          const hasFramer =
+            !!document.querySelector('script[data-framer-bundle="main"]') &&
+            !!document.getElementById("main")?.hasAttribute("data-framer-hydrate-v2");
+
+          if (!hasFramer) {
+            window.__enrauxHydrated = true;
+            if (document.readyState === "loading") {
+              document.addEventListener("DOMContentLoaded", () => fn(), { once: true });
+            } else {
+              fn();
+            }
+            return;
+          }
+
+          const isReady = () =>
+            !!(
+              window.MotionIsMounted === true ||
+              document.querySelector("[data-framer-form-hydrated], [data-hydrated]")
+            );
+
+          if (isReady()) {
+            window.__enrauxHydrated = true;
+            fn();
+            return;
+          }
+
+          const startTime = Date.now();
+          const poll = setInterval(() => {
+            if (isReady() || Date.now() - startTime >= 3200) {
+              clearInterval(poll);
+              window.__enrauxHydrated = true;
+              fn();
+            }
+          }, 80);
+        };
+      })();
+    </script>
+
     <!-- Footer 'Work' Removal System & Pill Hydration Guards -->
     <script is:inline>
       (() => {
@@ -1257,7 +1298,6 @@ const {
               if (pill && pill.style.display !== "none") {
                 pill.style.setProperty("display", "none", "important");
               }
-              el.textContent = "";
             }
           });
         }
@@ -1290,6 +1330,22 @@ const {
         removeWorkAndCollapseGap();
         document.addEventListener("DOMContentLoaded", removeWorkAndCollapseGap);
         window.addEventListener("load", removeWorkAndCollapseGap);
+        window.addEventListener("pageshow", removeWorkAndCollapseGap);
+
+        document.addEventListener(
+          "click",
+          (e) => {
+            if (
+              e.target &&
+              e.target.closest &&
+              e.target.closest("nav, header, [data-framer-name*='Menu' i]")
+            ) {
+              setTimeout(removeWorkAndCollapseGap, 50);
+              setTimeout(removeWorkAndCollapseGap, 250);
+            }
+          },
+          true
+        );
 
         let workPending = false;
         const workObserver = new MutationObserver(() => {
@@ -1304,6 +1360,10 @@ const {
           childList: true,
           subtree: true,
         });
+
+        setTimeout(() => {
+          workObserver.disconnect();
+        }, 5000);
       })();
     </script>
 
@@ -1336,29 +1396,32 @@ const {
           }
         }
 
-        // Run immediately and on DOM/window lifecycle events
-        cleanDuplicateBullets();
-        document.addEventListener("DOMContentLoaded", cleanDuplicateBullets);
-        window.addEventListener("load", cleanDuplicateBullets);
+        // Run after Framer hydration completes to eliminate React #418/#423 text mismatches
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+          cleanDuplicateBullets();
+          window.addEventListener("pageshow", cleanDuplicateBullets);
 
-        // Use MutationObserver to catch client-side hydration (e.g. Framer script_main)
-        let bulletPending = false;
-        const observer = new MutationObserver(() => {
-          if (bulletPending) return;
-          bulletPending = true;
-          requestAnimationFrame(() => {
-            bulletPending = false;
-            cleanDuplicateBullets();
+          let bulletPending = false;
+          const observer = new MutationObserver(() => {
+            if (bulletPending) return;
+            bulletPending = true;
+            requestAnimationFrame(() => {
+              bulletPending = false;
+              cleanDuplicateBullets();
+            });
           });
-        });
-        observer.observe(document.documentElement || document.body, {
-          childList: true,
-          subtree: true,
-          characterData: true,
-        });
+          observer.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
 
-        const bulletInterval = setInterval(cleanDuplicateBullets, 100);
-        setTimeout(() => clearInterval(bulletInterval), 3000);
+          const bulletInterval = setInterval(cleanDuplicateBullets, 150);
+          setTimeout(() => {
+            clearInterval(bulletInterval);
+            observer.disconnect();
+          }, 5000);
+        });
       })();
     </script>
 
@@ -1827,36 +1890,32 @@ const {
           });
         }
 
-        // Lifecycle executions
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initPhoneCountryDropdowns);
-        } else {
+        // Lifecycle executions (deferred via __enrauxWhenHydrated)
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
           initPhoneCountryDropdowns();
-        }
+          window.addEventListener("pageshow", initPhoneCountryDropdowns);
+          document.addEventListener("astro:page-load", initPhoneCountryDropdowns);
 
-        window.addEventListener("load", initPhoneCountryDropdowns);
-        window.addEventListener("pageshow", initPhoneCountryDropdowns);
-        document.addEventListener("astro:page-load", initPhoneCountryDropdowns);
-
-        // rAF-throttled MutationObserver during 5000ms Framer hydration window
-        let isDropdownPending = false;
-        const dropdownObserver = new MutationObserver(() => {
-          if (isDropdownPending) return;
-          isDropdownPending = true;
-          requestAnimationFrame(() => {
-            isDropdownPending = false;
-            initPhoneCountryDropdowns();
+          // rAF-throttled MutationObserver during 5000ms Framer hydration window
+          let isDropdownPending = false;
+          const dropdownObserver = new MutationObserver(() => {
+            if (isDropdownPending) return;
+            isDropdownPending = true;
+            requestAnimationFrame(() => {
+              isDropdownPending = false;
+              initPhoneCountryDropdowns();
+            });
           });
-        });
 
-        dropdownObserver.observe(document.documentElement || document.body, {
-          childList: true,
-          subtree: true,
-        });
+          dropdownObserver.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+          });
 
-        setTimeout(() => {
-          dropdownObserver.disconnect();
-        }, 5000);
+          setTimeout(() => {
+            dropdownObserver.disconnect();
+          }, 5000);
+        });
 
         window.__initPhoneCountryDropdowns = initPhoneCountryDropdowns;
 
@@ -2600,46 +2659,57 @@ const {
           }
         }
 
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initServiceSync);
-        } else {
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
           initServiceSync();
-        }
-        document.addEventListener("astro:page-load", initServiceSync);
+          window.addEventListener("pageshow", initServiceSync);
+          document.addEventListener("astro:page-load", initServiceSync);
 
-        // Hydration window interval to preserve ?service= selection if React/Framer resets it
-        const urlSyncInterval = setInterval(() => {
-          if (!userInteractedWithService) {
-            applyServiceFromUrl();
-          }
-        }, 100);
-        setTimeout(() => clearInterval(urlSyncInterval), 4000);
-
-        // Guard MutationObserver against infinite loops and input/textarea thrashing
-        const pillObserver = new MutationObserver((mutations) => {
-          let shouldCheck = false;
-          for (let i = 0; i < mutations.length; i++) {
-            const m = mutations[i];
-            const tag = m.target && m.target.tagName;
-            if (tag === "INPUT" || tag === "TEXTAREA") continue;
-            if (
-              m.target &&
-              m.target.closest &&
-              (m.target.closest("input") || m.target.closest("textarea"))
-            ) {
-              continue;
+          // Hydration window interval to preserve ?service= selection if React/Framer resets it
+          const urlSyncInterval = setInterval(() => {
+            if (!userInteractedWithService) {
+              applyServiceFromUrl();
             }
-            shouldCheck = true;
-            break;
-          }
-          if (!shouldCheck) return;
-          initServiceSync();
-          restoreSelectionState();
-        });
+          }, 100);
+          setTimeout(() => clearInterval(urlSyncInterval), 4000);
 
-        pillObserver.observe(document.documentElement || document.body, {
-          childList: true,
-          subtree: true,
+          // Only attach pillObserver on /contact, throttled with rAF, disconnecting after 5000ms
+          if (window.location.pathname.includes("contact")) {
+            let pillPending = false;
+            const pillObserver = new MutationObserver((mutations) => {
+              let shouldCheck = false;
+              for (let i = 0; i < mutations.length; i++) {
+                const m = mutations[i];
+                const tag = m.target && m.target.tagName;
+                if (tag === "INPUT" || tag === "TEXTAREA") continue;
+                if (
+                  m.target &&
+                  m.target.closest &&
+                  (m.target.closest("input") || m.target.closest("textarea"))
+                ) {
+                  continue;
+                }
+                shouldCheck = true;
+                break;
+              }
+              if (!shouldCheck) return;
+              if (pillPending) return;
+              pillPending = true;
+              requestAnimationFrame(() => {
+                pillPending = false;
+                initServiceSync();
+                restoreSelectionState();
+              });
+            });
+
+            pillObserver.observe(document.documentElement || document.body, {
+              childList: true,
+              subtree: true,
+            });
+
+            setTimeout(() => {
+              pillObserver.disconnect();
+            }, 5000);
+          }
         });
       })();
     </script>
@@ -2649,6 +2719,8 @@ const {
       (() => {
         const rawPath = window.location.pathname;
         const isBlog = rawPath.startsWith("/blog") || rawPath.startsWith("/blog-");
+        if (!isBlog) return;
+
         const cleanPath = rawPath.replace(/^\/blog\/?/, "").replace(/\/$/, "");
         const isBlog1 =
           cleanPath.includes("why-sending-paid-traffic") ||
@@ -2708,7 +2780,7 @@ const {
         }
 
         // On the 7 generated blog pages: protect title, H1, and strip hydrate markers
-        if (isBlog && !isBlog1 && cleanPath !== "") {
+        if (!isBlog1 && cleanPath !== "") {
           const expectedTitle = document.title;
           let expectedH1 = "";
           const h1El = document.querySelector("h1");
@@ -2740,29 +2812,52 @@ const {
           document.addEventListener("DOMContentLoaded", protectArticleDom);
           window.addEventListener("load", protectArticleDom);
 
-          const articleObserver = new MutationObserver(protectArticleDom);
+          let articlePending = false;
+          const articleObserver = new MutationObserver(() => {
+            if (articlePending) return;
+            articlePending = true;
+            requestAnimationFrame(() => {
+              articlePending = false;
+              protectArticleDom();
+            });
+          });
           articleObserver.observe(document.documentElement || document.body, {
             childList: true,
             subtree: true,
             characterData: true,
           });
 
-          const timer = setInterval(protectArticleDom, 50);
-          setTimeout(() => clearInterval(timer), 4000);
+          const timer = setInterval(protectArticleDom, 100);
+          setTimeout(() => {
+            clearInterval(timer);
+            articleObserver.disconnect();
+          }, 5000);
         } else {
-          enforcePlaybookBadge();
-          document.addEventListener("DOMContentLoaded", enforcePlaybookBadge);
-          window.addEventListener("load", enforcePlaybookBadge);
+          (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+            enforcePlaybookBadge();
+            window.addEventListener("pageshow", enforcePlaybookBadge);
 
-          const observer = new MutationObserver(enforcePlaybookBadge);
-          observer.observe(document.documentElement || document.body, {
-            childList: true,
-            subtree: true,
-            characterData: true,
+            let badgePending = false;
+            const observer = new MutationObserver(() => {
+              if (badgePending) return;
+              badgePending = true;
+              requestAnimationFrame(() => {
+                badgePending = false;
+                enforcePlaybookBadge();
+              });
+            });
+            observer.observe(document.documentElement || document.body, {
+              childList: true,
+              subtree: true,
+              characterData: true,
+            });
+
+            const badgeTimer = setInterval(enforcePlaybookBadge, 150);
+            setTimeout(() => {
+              clearInterval(badgeTimer);
+              observer.disconnect();
+            }, 5000);
           });
-
-          const badgeTimer = setInterval(enforcePlaybookBadge, 50);
-          setTimeout(() => clearInterval(badgeTimer), 4000);
         }
       })();
     </script>
@@ -3002,7 +3097,6 @@ const {
                     pill.style.setProperty("display", "none", "important");
                   }
                 }
-                node.nodeValue = "";
               }
               if (node.nodeValue && /\$20,000\s*Flat/i.test(node.nodeValue)) {
                 node.nodeValue = node.nodeValue.replace(/\$20,000\s*Flat/gi, "$7k+");
@@ -3191,14 +3285,14 @@ const {
             }
           });
 
-          // Replace text node containing 'Forma Studio' with Enraux copyright
-          replaceFormaStudioText();
-
           // Guard light-header location text color against Framer hydration
           guardLocationTextColor();
 
-          // Guard legal pages (terms & privacy) against Framer hydration
-          guardLegalPages();
+          // Text-mutating guards (only run after hydration so React hydrateRoot never mismatches)
+          if (window.__enrauxHydrated) {
+            replaceFormaStudioText();
+            guardLegalPages();
+          }
 
           // Purge any re-injected Framer CDN favicons
           try {
@@ -3300,10 +3394,19 @@ const {
             linkObserver.disconnect();
           }, 5000);
         });
-        guardLegalPages();
-        document.addEventListener("DOMContentLoaded", guardLegalPages);
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+          replaceFormaStudioText();
+          guardLegalPages();
+          const legalTimer = setInterval(() => {
+            replaceFormaStudioText();
+            guardLegalPages();
+          }, 200);
+          setTimeout(() => clearInterval(legalTimer), 3000);
+        });
+
         window.addEventListener("pageshow", () => {
           normalizeAllLinks();
+          replaceFormaStudioText();
           guardLegalPages();
         });
       })();
@@ -3520,31 +3623,28 @@ const {
 
         // Active MutationObserver guard to cancel any animations accidentally attached to Navbar
         let navGuardPending = false;
-        const navAnimGuard = new MutationObserver((mutations) => {
+        const navAnimGuard = new MutationObserver(() => {
           if (navGuardPending) return;
-          const touchesNav = mutations.some((m) => {
-            const target = m.target;
-            return (
-              target &&
-              target.closest &&
-              target.closest(
-                "nav, header, [data-framer-name*='Nav' i], [data-framer-name*='Header' i], [data-framer-name*='Menu' i], .framer-stbjvl-container, .framer-1kmos2s-container"
-              )
-            );
+          navGuardPending = true;
+          requestAnimationFrame(() => {
+            navGuardPending = false;
+            cancelNavbarAnimations();
           });
-          if (touchesNav) {
-            navGuardPending = true;
-            requestAnimationFrame(() => {
-              navGuardPending = false;
-              cancelNavbarAnimations();
-            });
-          }
         });
 
-        navAnimGuard.observe(document.documentElement || document.body, {
-          childList: true,
-          subtree: true,
+        const navTargets = document.querySelectorAll(
+          "nav, .framer-stbjvl-container, .framer-1kmos2s-container"
+        );
+        navTargets.forEach((el) => {
+          navAnimGuard.observe(el, {
+            childList: true,
+            subtree: true,
+          });
         });
+
+        setTimeout(() => {
+          navAnimGuard.disconnect();
+        }, 6000);
       })();
     </script>
 
@@ -3762,25 +3862,31 @@ const {
           });
         }
 
-        injectPricingMenuLink();
-        document.addEventListener("DOMContentLoaded", injectPricingMenuLink);
-        window.addEventListener("load", injectPricingMenuLink);
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+          injectPricingMenuLink();
+          window.addEventListener("load", injectPricingMenuLink);
+          window.addEventListener("pageshow", injectPricingMenuLink);
 
-        let pricingNavPending = false;
-        const pricingNavObserver = new MutationObserver(() => {
-          if (pricingNavPending) return;
-          pricingNavPending = true;
-          requestAnimationFrame(() => {
-            pricingNavPending = false;
-            injectPricingMenuLink();
-            if (typeof window.__setPricingButtonsRole === "function") {
-              window.__setPricingButtonsRole();
-            }
+          let pricingNavPending = false;
+          const pricingNavObserver = new MutationObserver(() => {
+            if (pricingNavPending) return;
+            pricingNavPending = true;
+            requestAnimationFrame(() => {
+              pricingNavPending = false;
+              injectPricingMenuLink();
+              if (typeof window.__setPricingButtonsRole === "function") {
+                window.__setPricingButtonsRole();
+              }
+            });
           });
-        });
-        pricingNavObserver.observe(document.documentElement || document.body, {
-          childList: true,
-          subtree: true,
+          pricingNavObserver.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true,
+          });
+
+          setTimeout(() => {
+            pricingNavObserver.disconnect();
+          }, 6000);
         });
 
         window.addEventListener(
@@ -3994,7 +4100,6 @@ const {
           window.addEventListener(moveEvt, onPointerMove, { passive: true });
           window.addEventListener(downEvt, onPointerDown, { passive: true });
           window.addEventListener(upEvt, onPointerUp, { passive: true });
-          window.addEventListener("scroll", onScroll, { passive: true });
           document.addEventListener("mouseleave", hideCursor);
           window.addEventListener("blur", hideCursor);
 
@@ -4011,7 +4116,6 @@ const {
           window.removeEventListener(moveEvt, onPointerMove);
           window.removeEventListener(downEvt, onPointerDown);
           window.removeEventListener(upEvt, onPointerUp);
-          window.removeEventListener("scroll", onScroll);
           document.removeEventListener("mouseleave", hideCursor);
           window.removeEventListener("blur", hideCursor);
 
@@ -4051,8 +4155,8 @@ const {
       })();
     </script>
 
-    <!-- Fix Framer Badge Container / React Error #405 -->
-    <div id="__framer-badge-container" hidden aria-hidden="true"></div>
+    <!-- Fix Framer Badge Container / React Error #405, #418 & #423 -->
+    <div id="__framer-badge-container" hidden aria-hidden="true"><!--$?--><template id="B:0"></template><!--/$--></div>
 
     <!-- Heading Order Accessibility Normalizer (Hydration-Safe) -->
     <script is:inline>
@@ -4099,13 +4203,12 @@ const {
             });
         }
 
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", normalizeHeadingAriaLevels);
-        } else {
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
           normalizeHeadingAriaLevels();
-        }
-        window.addEventListener("load", normalizeHeadingAriaLevels);
-        setTimeout(normalizeHeadingAriaLevels, 600);
+          window.addEventListener("load", normalizeHeadingAriaLevels);
+          window.addEventListener("pageshow", normalizeHeadingAriaLevels);
+          setTimeout(normalizeHeadingAriaLevels, 600);
+        });
       })();
     </script>
   </body>
