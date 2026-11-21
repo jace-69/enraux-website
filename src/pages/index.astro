@@ -1,17 +1,21 @@
 ---
+import fs from "node:fs";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const indexCss = fs.readFileSync(new URL("../../public/styles/index.css", import.meta.url), "utf-8");
 ---
 
 <BaseLayout
   title="Enraux"
   description="Enraux engineers high-converting landing pages, visual identity, and monthly ad creatives that turn cold clicks into profitable revenue."
   cssFile="/styles/index.css"
+  inlineCss={indexCss}
   bodyClass=""
 >
   <Fragment slot="head" is:raw>
-    <link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/vEydk8LUwvYV3ZJtsQhKLqsza0.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/EN0wrjjcgDdG3SMgxfEI19PNHRs.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librecasloncondensed/v3/flUrRrasxYEyVwtcWIsbLunUPow3bHNaxvyEX60aZ0aC.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/vEydk8LUwvYV3ZJtsQhKLqsza0.woff2" crossorigin media="(min-width: 810px)" />
+    <link rel="preload" as="font" type="font/woff2" href="https://framerusercontent.com/assets/EN0wrjjcgDdG3SMgxfEI19PNHRs.woff2" crossorigin media="(min-width: 810px)" />
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/librecasloncondensed/v3/flUrRrasxYEyVwtcWIsbLunUPow3bHNaxvyEX60aZ0aC.woff2" crossorigin media="(min-width: 810px)" />
     <link rel="canonical" href="https://enraux.com/" data-framer-generated-canonical>
     <meta property="og:url" content="https://enraux.com/">
     <meta name="framer-search-index" content="https://framerusercontent.com/sites/4HQ472h9bFy8jORlJloSQB/searchIndex-zkBrNSOKbs8d.json">

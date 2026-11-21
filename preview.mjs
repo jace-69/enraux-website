@@ -469,8 +469,12 @@ ${message}
       const baseLayoutContent = fs.readFileSync(baseLayoutPath, "utf-8");
       const baseTemplate = baseLayoutContent.replace(/^---[\s\S]*?---\s*/, "");
 
+      // Cleanly replace inlineCss conditional with stylesheet link before evaluating other props
+      const inlineCssPattern = /\{inlineCss\s*\?[\s\S]*?:\s*\(\s*<link rel="stylesheet"[^>]*\/>\s*\)\s*\}/;
+
       // Use function replacers so JavaScript never interprets $& or $' in minified CSS or slots
       let renderedHtml = baseTemplate
+        .replace(inlineCssPattern, () => `<link rel="stylesheet" href="${cssFile}" />`)
         .replace("{title}", () => title)
         .replace("content={description}", () => `content="${escapeHtml(description)}"`)
         .replace('href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`}', () => `href="${cssFile}"`)

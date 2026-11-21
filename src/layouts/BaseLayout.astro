@@ -4,6 +4,7 @@ interface Props {
   description?: string;
   cssFile?: string;
   bodyClass?: string;
+  inlineCss?: string;
 }
 
 const {
@@ -11,6 +12,7 @@ const {
   description = "Enraux engineers high-converting landing pages, visual identity, and monthly ad creatives that turn cold clicks into profitable revenue.",
   cssFile = "/styles/index.css",
   bodyClass = "",
+  inlineCss = "",
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -25,7 +27,11 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" />
-    <link rel="stylesheet" href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`} fetchpriority="high" />
+    {inlineCss ? (
+      <style is:inline set:html={inlineCss} />
+    ) : (
+      <link rel="stylesheet" href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`} fetchpriority="high" />
+    )}
 
     <style is:global>
       /* 1. Canvas Lock & Framer Stacked Scale-Back View Transition */
@@ -721,13 +727,22 @@ const {
       })();
     </script>
 
-    <!-- Wait-for-CSS Smooth Page Fade & Navigation Interceptor -->
+    <!-- Manual scroll restoration to prevent browser from restoring footer scroll position -->
+    <script is:inline>
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+    </script>
+
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+
+    <!-- Navigation Interceptor, Link Normalizer & Instant View Transitions -->
     <script is:inline>
       (() => {
-        // 1. Manual scroll restoration to prevent browser from restoring footer scroll position
-        if ("scrollRestoration" in history) {
-          history.scrollRestoration = "manual";
-        }
+        let isNavigating = false;
 
         // Scroll-to-top helper
         function resetScrollToTop() {
@@ -1000,7 +1015,7 @@ const {
         );
 
         // Immediate navigation for simultaneous native view transitions (0ms delay)
-        let isNavigating = false;
+        // isNavigating declared at top of scope
 
         // Pricing Card CTA Button Interceptor (synchronous Click #1 capture phase)
         window.addEventListener(
@@ -1215,11 +1230,6 @@ const {
         );
       })();
     </script>
-
-    <slot name="head" />
-  </head>
-  <body class={bodyClass}>
-    <slot />
 
     <!-- Hydration State Detector & Task Scheduler -->
     <script is:inline>
@@ -4243,56 +4253,68 @@ const {
       })();
     </script>
 
-    <!-- Single-Open FAQ Accordion (Zero page-load overhead — delegated click listener) -->
+    <!-- Single-Open FAQ Accordion (Zero page-load overhead — Framer Motion onTap PointerEvent dispatching) -->
     <script is:inline>
       (() => {
         let isAutoClosingFaq = false;
 
         document.addEventListener(
-          "click",
+          "pointerup",
           (e) => {
-            if (isAutoClosingFaq) return;
+            if (isAutoClosingFaq || e.isPrimary === false) return;
             const clickedCard =
               e.target && typeof e.target.closest === "function"
                 ? e.target.closest(".framer-0Ejqx")
                 : null;
-            if (!clickedCard) return;
+            if (!clickedCard || clickedCard.getAttribute("data-framer-name") !== "Closed") return;
             const container = clickedCard.closest(".framer-uwP5E");
             if (!container) return;
 
-            // Check if the clicked card was currently closed at the moment of click
-            const isClosed =
-              !clickedCard.querySelector("p") ||
-              clickedCard.getAttribute("data-framer-name") === "Closed" ||
-              clickedCard.getAttribute("data-framer-name") === "Variant 4" ||
-              clickedCard.classList.contains("framer-v-1k5ryne") ||
-              clickedCard.classList.contains("framer-v-1esze88");
-
-            // If user clicked an already-open card, let Framer close it normally
-            if (!isClosed) return;
-
-            // Wait a frame so Framer's React handler toggles the clicked card to open,
-            // then close all other open FAQ siblings in the same container.
-            requestAnimationFrame(() => {
-              const siblings = container.querySelectorAll(".framer-0Ejqx");
-              siblings.forEach((other) => {
+            setTimeout(() => {
+              const openSiblings = container.querySelectorAll('.framer-0Ejqx[data-framer-name="Open"]');
+              openSiblings.forEach((other) => {
                 if (other === clickedCard) return;
-                const isOpen =
-                  Boolean(other.querySelector("p")) ||
-                  (other.getAttribute("data-framer-name") !== "Closed" &&
-                    other.getAttribute("data-framer-name") !== "Variant 4" &&
-                    !other.classList.contains("framer-v-1k5ryne") &&
-                    !other.classList.contains("framer-v-1esze88"));
-                if (isOpen) {
-                  isAutoClosingFaq = true;
-                  try {
-                    other.click();
-                  } finally {
-                    isAutoClosingFaq = false;
-                  }
+                const rect = other.getBoundingClientRect();
+                const x = rect.left + Math.min(20, Math.max(2, rect.width / 2));
+                const y = rect.top + Math.min(20, Math.max(2, rect.height / 2));
+
+                isAutoClosingFaq = true;
+                try {
+                  other.dispatchEvent(
+                    new PointerEvent("pointerdown", {
+                      bubbles: true,
+                      cancelable: true,
+                      composed: true,
+                      view: window,
+                      pointerId: 99,
+                      pointerType: "mouse",
+                      isPrimary: true,
+                      button: 0,
+                      buttons: 1,
+                      clientX: x,
+                      clientY: y,
+                    })
+                  );
+                  other.dispatchEvent(
+                    new PointerEvent("pointerup", {
+                      bubbles: true,
+                      cancelable: true,
+                      composed: true,
+                      view: window,
+                      pointerId: 99,
+                      pointerType: "mouse",
+                      isPrimary: true,
+                      button: 0,
+                      buttons: 0,
+                      clientX: x,
+                      clientY: y,
+                    })
+                  );
+                } finally {
+                  isAutoClosingFaq = false;
                 }
               });
-            });
+            }, 40);
           },
           true
         );
