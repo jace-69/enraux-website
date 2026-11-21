@@ -25,7 +25,7 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" />
-    <link rel="stylesheet" href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`} />
+    <link rel="stylesheet" href={cssFile.includes("?") ? cssFile : `${cssFile}?v=2`} fetchpriority="high" />
 
     <style is:global>
       /* 1. Canvas Lock & Framer Stacked Scale-Back View Transition */
@@ -555,6 +555,43 @@ const {
         display: none !important;
       }
 
+      /* Permanent 'Work' Route Removal (Footer, Navbar, Menu Drawer) */
+      a[href="/work"],
+      a[href="./work"],
+      a[href$="/work"],
+      .framer-gUICt .framer-9qg7n9,
+      [data-framer-name="Work"],
+      .framer-gUICt [data-framer-name="Work"],
+      .framer-gUICt :has(> a[href="/work"]),
+      .framer-gUICt :has(> a[href="./work"]),
+      .framer-gUICt :has(> a[href$="/work"]),
+      .framer-gUICt :has(> [data-framer-name="Work"]),
+      .framer-1axf9e6 > [data-framer-name="Work"],
+      .framer-1axf9e6 > :has(a[href="/work"]),
+      .framer-1axf9e6 > :has(a[href="./work"]),
+      .framer-1axf9e6 > :has(a[href$="/work"]),
+      .framer-1axf9e6 > :has([data-framer-name="Work"]),
+      .framer-17nx4mu-container [data-framer-name="Work"],
+      .framer-hksrw [data-framer-name="Work"],
+      nav :has(> a[href="/work"]),
+      nav :has(> a[href="./work"]),
+      nav :has(> a[href$="/work"]),
+      nav [data-framer-name="Work"],
+      footer :has(> a[href="/work"]),
+      footer :has(> a[href="./work"]),
+      footer :has(> a[href$="/work"]),
+      footer [data-framer-name="Work"],
+      [data-framer-name*="Menu" i] :has(> a[href="/work"]),
+      [data-framer-name*="Menu" i] :has(> a[href="./work"]),
+      [data-framer-name*="Menu" i] :has(> a[href$="/work"]),
+      [data-framer-name*="Menu" i] [data-framer-name="Work"],
+      [data-framer-name="Header"] :has(> a[href="/work"]),
+      [data-framer-name="Header"] :has(> a[href="./work"]),
+      [data-framer-name="Header"] :has(> a[href$="/work"]),
+      [data-framer-name="Header"] [data-framer-name="Work"] {
+        display: none !important;
+      }
+
       /* 5. Pricing Card CTA Button Cursor Fix */
       .framer-KtiaD .framer-yicckt-container,
       .framer-KtiaD .framer-upW4V,
@@ -692,47 +729,16 @@ const {
           }
         }
 
-        const editorbarObserver = new MutationObserver((mutations) => {
+        const headIconObserver = new MutationObserver(() => {
           purgeFramerIcons();
-          for (let i = 0; i < mutations.length; i++) {
-            const added = mutations[i].addedNodes;
-            for (let j = 0; j < added.length; j++) {
-              const node = added[j];
-              if (node.nodeType === 1) {
-                const id = node.id || "";
-                const className = typeof node.className === "string" ? node.className : "";
-                const src = node.getAttribute ? (node.getAttribute("src") || "") : "";
-                if (
-                  (node.tagName === "LINK" && (node.getAttribute("rel") || "").includes("icon") && (node.getAttribute("href") || "").includes("framerusercontent.com")) ||
-                  id.includes("framer-editorbar") ||
-                  className.includes("framer-editorbar") ||
-                  node.matches?.(editorbarSelector) ||
-                  (node.tagName === "IFRAME" && (src.includes("framer.com/edit") || src.includes("editorbar")))
-                ) {
-                  node.remove();
-                } else if (node.querySelectorAll) {
-                  const nested = node.querySelectorAll(editorbarSelector);
-                  for (let k = 0; k < nested.length; k++) {
-                    nested[k].remove();
-                  }
-                  const nestedIcons = node.querySelectorAll('link[rel*="icon"]');
-                  for (let k = 0; k < nestedIcons.length; k++) {
-                    if ((nestedIcons[k].getAttribute("href") || "").includes("framerusercontent.com")) {
-                      nestedIcons[k].remove();
-                    }
-                  }
-                }
-              }
-            }
-          }
         });
 
-        if (document.documentElement) {
-          editorbarObserver.observe(document.documentElement, { childList: true, subtree: true });
+        if (document.head) {
+          headIconObserver.observe(document.head, { childList: true });
         } else {
           document.addEventListener("DOMContentLoaded", () => {
-            if (document.documentElement) {
-              editorbarObserver.observe(document.documentElement, { childList: true, subtree: true });
+            if (document.head) {
+              headIconObserver.observe(document.head, { childList: true });
             }
           });
         }
@@ -740,8 +746,6 @@ const {
         purgeEditorBar();
         document.addEventListener("DOMContentLoaded", purgeEditorBar);
         window.addEventListener("load", purgeEditorBar);
-        const timer = setInterval(purgeEditorBar, 100);
-        setTimeout(() => clearInterval(timer), 4000);
       })();
     </script>
 
@@ -1292,7 +1296,7 @@ const {
     <script is:inline>
       (() => {
         function hide3DProductRendersPills() {
-          document.querySelectorAll("p, span, div").forEach((el) => {
+          document.querySelectorAll(".framer-h8ujbw-container p, .framer-HrRNs p, p").forEach((el) => {
             if (el.children.length === 0 && (el.textContent || "").trim() === "3D Product Renders") {
               const pill = el.closest(".framer-h8ujbw-container") || el.closest(".framer-HrRNs") || el.parentElement;
               if (pill && pill.style.display !== "none") {
@@ -1305,17 +1309,35 @@ const {
 
         function removeWorkAndCollapseGap() {
           hide3DProductRendersPills();
-          document.querySelectorAll("a, p, span").forEach((el) => {
-            const isWorkText = el.children.length === 0 && (el.textContent || "").trim() === "Work";
-            const isWorkHref = el.tagName === "A" && /\/work$/i.test(el.getAttribute("href") || "");
+          document.querySelectorAll("a, p, span, [data-framer-name='Work'], .framer-9qg7n9").forEach((el) => {
+            const isWorkFramerName = el.getAttribute("data-framer-name") === "Work";
+            const isWorkContainer = el.classList.contains("framer-9qg7n9");
+            const isWorkText = !isWorkContainer && el.children.length === 0 && (el.textContent || "").trim() === "Work";
+            let isWorkHref = false;
+            if (el.tagName === "A") {
+              const href = el.getAttribute("href") || "";
+              if (href) {
+                if (/\/work(?:\/|\?|#|$)/i.test(href) || href.endsWith("/work")) {
+                  try {
+                    const u = new URL(href, window.location.href);
+                    if (u.pathname.replace(/\/+$/, "").endsWith("/work")) {
+                      isWorkHref = true;
+                    }
+                  } catch (e) {
+                    if (/\/work(?:\/|\?|#|$)/i.test(href)) isWorkHref = true;
+                  }
+                }
+              }
+            }
 
-            if (isWorkText || isWorkHref) {
-              let targetToHide = el.closest("a") || el;
+            if (isWorkText || isWorkHref || isWorkFramerName || isWorkContainer) {
+              let targetToHide = isWorkFramerName || isWorkContainer ? el : (el.closest("a") || el);
               while (
                 targetToHide.parentElement &&
                 targetToHide.parentElement.tagName !== "BODY" &&
                 targetToHide.parentElement.tagName !== "NAV" &&
                 targetToHide.parentElement.tagName !== "FOOTER" &&
+                !targetToHide.parentElement.classList.contains("framer-1axf9e6") &&
                 (targetToHide.parentElement.textContent || "").trim() === "Work"
               ) {
                 targetToHide = targetToHide.parentElement;
@@ -1326,8 +1348,10 @@ const {
             }
           });
         }
+        window.__removeWorkAndCollapseGap = removeWorkAndCollapseGap;
 
-        removeWorkAndCollapseGap();
+        requestAnimationFrame(removeWorkAndCollapseGap);
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(removeWorkAndCollapseGap);
         document.addEventListener("DOMContentLoaded", removeWorkAndCollapseGap);
         window.addEventListener("load", removeWorkAndCollapseGap);
         window.addEventListener("pageshow", removeWorkAndCollapseGap);
@@ -1338,13 +1362,27 @@ const {
             if (
               e.target &&
               e.target.closest &&
-              e.target.closest("nav, header, [data-framer-name*='Menu' i]")
+              e.target.closest(
+                "nav, header, .framer-stbjvl-container, .framer-1kmos2s-container, [data-framer-name*='Nav' i], [data-framer-name*='Header' i], [data-framer-name*='Menu' i]"
+              )
             ) {
+              removeWorkAndCollapseGap();
               setTimeout(removeWorkAndCollapseGap, 50);
               setTimeout(removeWorkAndCollapseGap, 250);
+              setTimeout(removeWorkAndCollapseGap, 500);
             }
           },
           true
+        );
+
+        let resizeTimer = null;
+        window.addEventListener(
+          "resize",
+          () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(removeWorkAndCollapseGap, 150);
+          },
+          { passive: true }
         );
 
         let workPending = false;
@@ -1397,9 +1435,11 @@ const {
         }
 
         // Run after Framer hydration completes to eliminate React #418/#423 text mismatches
+        window.addEventListener("load", cleanDuplicateBullets);
         (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
           cleanDuplicateBullets();
           window.addEventListener("pageshow", cleanDuplicateBullets);
+          setTimeout(cleanDuplicateBullets, 1500);
 
           let bulletPending = false;
           const observer = new MutationObserver(() => {
@@ -1416,9 +1456,7 @@ const {
             characterData: true,
           });
 
-          const bulletInterval = setInterval(cleanDuplicateBullets, 150);
           setTimeout(() => {
-            clearInterval(bulletInterval);
             observer.disconnect();
           }, 5000);
         });
@@ -1627,6 +1665,17 @@ const {
           return html;
         }
 
+        function populateAllCountryOptions(selectEl) {
+          if (!selectEl || selectEl.dataset.enrauxOptionsLoaded === "1") return;
+          const currentVal = selectEl.value;
+          selectEl.innerHTML = buildCountryOptionsHTML();
+          selectEl.dataset.enrauxOptionsLoaded = "1";
+          if (currentVal) {
+            selectEl.value = currentVal;
+          }
+        }
+        window.__populateAllCountryOptions = populateAllCountryOptions;
+
         const PRIMARY_ISOS = new Set(["US", "GB", "RU", "AU", "DE", "FR", "IN", "ZA", "NG", "AE"]);
 
         const countryMap = new Map();
@@ -1708,6 +1757,9 @@ const {
             }
 
             if (countrySelect.value !== matched.value) {
+              if (countrySelect.dataset.enrauxOptionsLoaded !== "1") {
+                populateAllCountryOptions(countrySelect);
+              }
               countrySelect.value = matched.value;
             }
             countrySelect.dataset.enrauxSource = "auto";
@@ -1772,7 +1824,16 @@ const {
               countrySelect.className = "framer-form-input enraux-country-select";
               countrySelect.setAttribute("aria-label", "Country and dialing code");
               countrySelect.required = true;
-              countrySelect.innerHTML = buildCountryOptionsHTML();
+              countrySelect.innerHTML =
+                '<option value="" disabled selected label="Country (+)">Country (+)</option>' +
+                '<option value="US|+1">United States (+1)</option>';
+              countrySelect.dataset.enrauxOptionsLoaded = "0";
+
+              const ensureOptions = () => populateAllCountryOptions(countrySelect);
+              countrySelect.addEventListener("focus", ensureOptions, { once: true });
+              countrySelect.addEventListener("pointerdown", ensureOptions, { once: true });
+              countrySelect.addEventListener("mousedown", ensureOptions, { once: true });
+              countrySelect.addEventListener("keydown", ensureOptions, { once: true });
 
               wrap.appendChild(countrySelect);
               wrapper.insertBefore(wrap, telInput);
@@ -1869,6 +1930,9 @@ const {
 
             // Restore cached values if available
             if (cachedState.country && (!countrySelect.value || countrySelect.value === "")) {
+              if (countrySelect.dataset.enrauxOptionsLoaded !== "1" && !countrySelect.querySelector(`option[value="${cachedState.country}"]`)) {
+                populateAllCountryOptions(countrySelect);
+              }
               countrySelect.value = cachedState.country;
             }
             if (cachedState.phone !== undefined && telInput.value === "") {
@@ -2665,12 +2729,14 @@ const {
           document.addEventListener("astro:page-load", initServiceSync);
 
           // Hydration window interval to preserve ?service= selection if React/Framer resets it
-          const urlSyncInterval = setInterval(() => {
-            if (!userInteractedWithService) {
-              applyServiceFromUrl();
-            }
-          }, 100);
-          setTimeout(() => clearInterval(urlSyncInterval), 4000);
+          if (window.location.search.includes("service=")) {
+            const urlSyncInterval = setInterval(() => {
+              if (!userInteractedWithService) {
+                applyServiceFromUrl();
+              }
+            }, 100);
+            setTimeout(() => clearInterval(urlSyncInterval), 4000);
+          }
 
           // Only attach pillObserver on /contact, throttled with rAF, disconnecting after 5000ms
           if (window.location.pathname.includes("contact")) {
@@ -3036,6 +3102,12 @@ const {
             a.setAttribute("rel", "noopener noreferrer");
             return true;
           }
+          if (lower.includes("linkedin.com")) {
+            a.setAttribute("href", "https://www.linkedin.com/company/enraux/");
+            a.setAttribute("target", "_blank");
+            a.setAttribute("rel", "noopener noreferrer");
+            return true;
+          }
           return false;
         }
 
@@ -3119,7 +3191,9 @@ const {
 
         function guardLegalPages() {
           try {
-            const currentPath = (window.location.pathname || "").replace(/\/+$/, "") || "/";
+            const rawPath = window.location.pathname || "";
+            if (!rawPath.includes("/terms") && !rawPath.includes("/privacy")) return;
+            const currentPath = rawPath.replace(/\/+$/, "") || "/";
             if (currentPath !== "/terms" && currentPath !== "/privacy") return;
 
             const root = document.body || document.documentElement;
@@ -3291,7 +3365,9 @@ const {
           // Text-mutating guards (only run after hydration so React hydrateRoot never mismatches)
           if (window.__enrauxHydrated) {
             replaceFormaStudioText();
-            guardLegalPages();
+            if (window.location.pathname.includes("/terms") || window.location.pathname.includes("/privacy")) {
+              guardLegalPages();
+            }
           }
 
           // Purge any re-injected Framer CDN favicons
@@ -3367,47 +3443,45 @@ const {
           setTimeout(normalizeAllLinks, 350);
         }, true);
 
+        function runPostHydrationNormalizers() {
+          normalizeAllLinks();
+          replaceFormaStudioText();
+          if (window.location.pathname.includes("/terms") || window.location.pathname.includes("/privacy")) {
+            guardLegalPages();
+          }
+        }
+
         // Defer initial normalizeAllLinks to window load so href rewrites don't trigger pre-hydration React #418 mismatches
         window.addEventListener("load", () => {
-          normalizeAllLinks();
-          const timer = setInterval(normalizeAllLinks, 100);
-          setTimeout(() => clearInterval(timer), 4000);
+          runPostHydrationNormalizers();
+          setTimeout(runPostHydrationNormalizers, 1500);
 
-          // RequestAnimationFrame-throttled childList observer active during initial hydration window (5000ms)
-          let pendingNormalize = false;
+          // 120ms-debounced childList observer active during initial hydration window (5000ms)
+          let linkDebounceTimer = null;
           const linkObserver = new MutationObserver(() => {
-            if (pendingNormalize) return;
-            pendingNormalize = true;
-            requestAnimationFrame(() => {
-              pendingNormalize = false;
-              normalizeAllLinks();
-            });
+            clearTimeout(linkDebounceTimer);
+            linkDebounceTimer = setTimeout(() => {
+              runPostHydrationNormalizers();
+            }, 120);
           });
 
           linkObserver.observe(document.documentElement || document.body, {
             childList: true,
             subtree: true,
-            characterData: true,
           });
 
           setTimeout(() => {
+            clearTimeout(linkDebounceTimer);
             linkObserver.disconnect();
           }, 5000);
         });
+
         (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
-          replaceFormaStudioText();
-          guardLegalPages();
-          const legalTimer = setInterval(() => {
-            replaceFormaStudioText();
-            guardLegalPages();
-          }, 200);
-          setTimeout(() => clearInterval(legalTimer), 3000);
+          runPostHydrationNormalizers();
         });
 
         window.addEventListener("pageshow", () => {
-          normalizeAllLinks();
-          replaceFormaStudioText();
-          guardLegalPages();
+          runPostHydrationNormalizers();
         });
       })();
     </script>
@@ -3607,7 +3681,7 @@ const {
         }
 
         // Schedule entrance animations safely without synchronous layout loops
-        cancelNavbarAnimations();
+        requestAnimationFrame(cancelNavbarAnimations);
         if (document.readyState === "loading") {
           document.addEventListener(
             "DOMContentLoaded",
@@ -3864,8 +3938,21 @@ const {
 
         (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
           injectPricingMenuLink();
-          window.addEventListener("load", injectPricingMenuLink);
-          window.addEventListener("pageshow", injectPricingMenuLink);
+          if (typeof window.__removeWorkAndCollapseGap === "function") {
+            window.__removeWorkAndCollapseGap();
+          }
+          window.addEventListener("load", () => {
+            injectPricingMenuLink();
+            if (typeof window.__removeWorkAndCollapseGap === "function") {
+              window.__removeWorkAndCollapseGap();
+            }
+          });
+          window.addEventListener("pageshow", () => {
+            injectPricingMenuLink();
+            if (typeof window.__removeWorkAndCollapseGap === "function") {
+              window.__removeWorkAndCollapseGap();
+            }
+          });
 
           let pricingNavPending = false;
           const pricingNavObserver = new MutationObserver(() => {
@@ -3874,6 +3961,9 @@ const {
             requestAnimationFrame(() => {
               pricingNavPending = false;
               injectPricingMenuLink();
+              if (typeof window.__removeWorkAndCollapseGap === "function") {
+                window.__removeWorkAndCollapseGap();
+              }
               if (typeof window.__setPricingButtonsRole === "function") {
                 window.__setPricingButtonsRole();
               }
@@ -3897,11 +3987,17 @@ const {
               typeof e.target.closest === "function" &&
               e.target.closest(".framer-r1ebey, .framer-qvIpE, .framer-1vfl530");
             if (trigger) {
-              requestAnimationFrame(injectPricingMenuLink);
-              setTimeout(injectPricingMenuLink, 50);
-              setTimeout(injectPricingMenuLink, 150);
-              setTimeout(injectPricingMenuLink, 300);
-              setTimeout(injectPricingMenuLink, 600);
+              const runAll = () => {
+                injectPricingMenuLink();
+                if (typeof window.__removeWorkAndCollapseGap === "function") {
+                  window.__removeWorkAndCollapseGap();
+                }
+              };
+              requestAnimationFrame(runAll);
+              setTimeout(runAll, 50);
+              setTimeout(runAll, 150);
+              setTimeout(runAll, 300);
+              setTimeout(runAll, 600);
             }
           },
           true
@@ -3916,15 +4012,21 @@ const {
           const appearElements = document.querySelectorAll(
             ".framer-208ybr [data-framer-appear-id], .framer-208ybr .framer-18b7vvs, .framer-208ybr .framer-21z1vs, .framer-208ybr .framer-16y13cd-container, .framer-208ybr .framer-wvinzv-container"
           );
-          appearElements.forEach((el) => {
-            if (el.closest(".framer-1e663qr, .framer-qsj2t3, .framer-g5dzqe") || el.tagName === "SPAN") return;
+          const elementsToFix = [];
+          for (let i = 0; i < appearElements.length; i++) {
+            const el = appearElements[i];
+            if (el.closest(".framer-1e663qr, .framer-qsj2t3, .framer-g5dzqe") || el.tagName === "SPAN") continue;
             const currentOpacity = parseFloat(window.getComputedStyle(el).opacity);
             if (!isNaN(currentOpacity) && currentOpacity < 0.5) {
-              el.style.transition = "opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
-              el.style.opacity = "1";
-              el.style.transform = "translateY(0px)";
+              elementsToFix.push(el);
             }
-          });
+          }
+          for (let i = 0; i < elementsToFix.length; i++) {
+            const el = elementsToFix[i];
+            el.style.transition = "opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0px)";
+          }
         }
 
         function scheduleHeroCheck() {
