@@ -555,40 +555,12 @@ const {
         display: none !important;
       }
 
-      /* Permanent 'Work' Route Removal (Footer, Navbar, Menu Drawer) */
+      /* Permanent 'Work' Route Removal (Footer, Navbar, Menu Drawer — zero :has() overhead) */
       a[href="/work"],
       a[href="./work"],
       a[href$="/work"],
       .framer-gUICt .framer-9qg7n9,
-      [data-framer-name="Work"],
-      .framer-gUICt [data-framer-name="Work"],
-      .framer-gUICt :has(> a[href="/work"]),
-      .framer-gUICt :has(> a[href="./work"]),
-      .framer-gUICt :has(> a[href$="/work"]),
-      .framer-gUICt :has(> [data-framer-name="Work"]),
-      .framer-1axf9e6 > [data-framer-name="Work"],
-      .framer-1axf9e6 > :has(a[href="/work"]),
-      .framer-1axf9e6 > :has(a[href="./work"]),
-      .framer-1axf9e6 > :has(a[href$="/work"]),
-      .framer-1axf9e6 > :has([data-framer-name="Work"]),
-      .framer-17nx4mu-container [data-framer-name="Work"],
-      .framer-hksrw [data-framer-name="Work"],
-      nav :has(> a[href="/work"]),
-      nav :has(> a[href="./work"]),
-      nav :has(> a[href$="/work"]),
-      nav [data-framer-name="Work"],
-      footer :has(> a[href="/work"]),
-      footer :has(> a[href="./work"]),
-      footer :has(> a[href$="/work"]),
-      footer [data-framer-name="Work"],
-      [data-framer-name*="Menu" i] :has(> a[href="/work"]),
-      [data-framer-name*="Menu" i] :has(> a[href="./work"]),
-      [data-framer-name*="Menu" i] :has(> a[href$="/work"]),
-      [data-framer-name*="Menu" i] [data-framer-name="Work"],
-      [data-framer-name="Header"] :has(> a[href="/work"]),
-      [data-framer-name="Header"] :has(> a[href="./work"]),
-      [data-framer-name="Header"] :has(> a[href$="/work"]),
-      [data-framer-name="Header"] [data-framer-name="Work"] {
+      [data-framer-name="Work"] {
         display: none !important;
       }
 
@@ -1296,7 +1268,7 @@ const {
     <script is:inline>
       (() => {
         function hide3DProductRendersPills() {
-          document.querySelectorAll(".framer-h8ujbw-container p, .framer-HrRNs p, p").forEach((el) => {
+          document.querySelectorAll(".framer-h8ujbw-container p, .framer-HrRNs p").forEach((el) => {
             if (el.children.length === 0 && (el.textContent || "").trim() === "3D Product Renders") {
               const pill = el.closest(".framer-h8ujbw-container") || el.closest(".framer-HrRNs") || el.parentElement;
               if (pill && pill.style.display !== "none") {
@@ -1309,29 +1281,13 @@ const {
 
         function removeWorkAndCollapseGap() {
           hide3DProductRendersPills();
-          document.querySelectorAll("a, p, span, [data-framer-name='Work'], .framer-9qg7n9").forEach((el) => {
-            const isWorkFramerName = el.getAttribute("data-framer-name") === "Work";
-            const isWorkContainer = el.classList.contains("framer-9qg7n9");
-            const isWorkText = !isWorkContainer && el.children.length === 0 && (el.textContent || "").trim() === "Work";
-            let isWorkHref = false;
-            if (el.tagName === "A") {
-              const href = el.getAttribute("href") || "";
-              if (href) {
-                if (/\/work(?:\/|\?|#|$)/i.test(href) || href.endsWith("/work")) {
-                  try {
-                    const u = new URL(href, window.location.href);
-                    if (u.pathname.replace(/\/+$/, "").endsWith("/work")) {
-                      isWorkHref = true;
-                    }
-                  } catch (e) {
-                    if (/\/work(?:\/|\?|#|$)/i.test(href)) isWorkHref = true;
-                  }
-                }
-              }
-            }
-
-            if (isWorkText || isWorkHref || isWorkFramerName || isWorkContainer) {
-              let targetToHide = isWorkFramerName || isWorkContainer ? el : (el.closest("a") || el);
+          document
+            .querySelectorAll('a[href*="/work"], [data-framer-name="Work"], .framer-gUICt .framer-9qg7n9')
+            .forEach((el) => {
+              let targetToHide =
+                el.getAttribute("data-framer-name") === "Work" || el.classList.contains("framer-9qg7n9")
+                  ? el
+                  : (el.closest("a") || el);
               while (
                 targetToHide.parentElement &&
                 targetToHide.parentElement.tagName !== "BODY" &&
@@ -1345,15 +1301,11 @@ const {
               if (targetToHide.style.display !== "none") {
                 targetToHide.style.setProperty("display", "none", "important");
               }
-            }
-          });
+            });
         }
         window.__removeWorkAndCollapseGap = removeWorkAndCollapseGap;
 
-        requestAnimationFrame(removeWorkAndCollapseGap);
         (window.__enrauxWhenHydrated || ((fn) => fn()))(removeWorkAndCollapseGap);
-        document.addEventListener("DOMContentLoaded", removeWorkAndCollapseGap);
-        window.addEventListener("load", removeWorkAndCollapseGap);
         window.addEventListener("pageshow", removeWorkAndCollapseGap);
 
         document.addEventListener(
@@ -1361,15 +1313,13 @@ const {
           (e) => {
             if (
               e.target &&
-              e.target.closest &&
+              typeof e.target.closest === "function" &&
               e.target.closest(
-                "nav, header, .framer-stbjvl-container, .framer-1kmos2s-container, [data-framer-name*='Nav' i], [data-framer-name*='Header' i], [data-framer-name*='Menu' i]"
+                'nav, header, .framer-stbjvl-container, .framer-1kmos2s-container, [data-framer-name*="Menu" i]'
               )
             ) {
-              removeWorkAndCollapseGap();
               setTimeout(removeWorkAndCollapseGap, 50);
               setTimeout(removeWorkAndCollapseGap, 250);
-              setTimeout(removeWorkAndCollapseGap, 500);
             }
           },
           true
@@ -1380,28 +1330,10 @@ const {
           "resize",
           () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(removeWorkAndCollapseGap, 150);
+            resizeTimer = setTimeout(removeWorkAndCollapseGap, 200);
           },
           { passive: true }
         );
-
-        let workPending = false;
-        const workObserver = new MutationObserver(() => {
-          if (workPending) return;
-          workPending = true;
-          requestAnimationFrame(() => {
-            workPending = false;
-            removeWorkAndCollapseGap();
-          });
-        });
-        workObserver.observe(document.documentElement || document.body, {
-          childList: true,
-          subtree: true,
-        });
-
-        setTimeout(() => {
-          workObserver.disconnect();
-        }, 5000);
       })();
     </script>
 
@@ -3961,9 +3893,6 @@ const {
             requestAnimationFrame(() => {
               pricingNavPending = false;
               injectPricingMenuLink();
-              if (typeof window.__removeWorkAndCollapseGap === "function") {
-                window.__removeWorkAndCollapseGap();
-              }
               if (typeof window.__setPricingButtonsRole === "function") {
                 window.__setPricingButtonsRole();
               }
@@ -4311,6 +4240,62 @@ const {
           window.addEventListener("pageshow", normalizeHeadingAriaLevels);
           setTimeout(normalizeHeadingAriaLevels, 600);
         });
+      })();
+    </script>
+
+    <!-- Single-Open FAQ Accordion (Zero page-load overhead — delegated click listener) -->
+    <script is:inline>
+      (() => {
+        let isAutoClosingFaq = false;
+
+        document.addEventListener(
+          "click",
+          (e) => {
+            if (isAutoClosingFaq) return;
+            const clickedCard =
+              e.target && typeof e.target.closest === "function"
+                ? e.target.closest(".framer-0Ejqx")
+                : null;
+            if (!clickedCard) return;
+            const container = clickedCard.closest(".framer-uwP5E");
+            if (!container) return;
+
+            // Check if the clicked card was currently closed at the moment of click
+            const isClosed =
+              !clickedCard.querySelector("p") ||
+              clickedCard.getAttribute("data-framer-name") === "Closed" ||
+              clickedCard.getAttribute("data-framer-name") === "Variant 4" ||
+              clickedCard.classList.contains("framer-v-1k5ryne") ||
+              clickedCard.classList.contains("framer-v-1esze88");
+
+            // If user clicked an already-open card, let Framer close it normally
+            if (!isClosed) return;
+
+            // Wait a frame so Framer's React handler toggles the clicked card to open,
+            // then close all other open FAQ siblings in the same container.
+            requestAnimationFrame(() => {
+              const siblings = container.querySelectorAll(".framer-0Ejqx");
+              siblings.forEach((other) => {
+                if (other === clickedCard) return;
+                const isOpen =
+                  Boolean(other.querySelector("p")) ||
+                  (other.getAttribute("data-framer-name") !== "Closed" &&
+                    other.getAttribute("data-framer-name") !== "Variant 4" &&
+                    !other.classList.contains("framer-v-1k5ryne") &&
+                    !other.classList.contains("framer-v-1esze88"));
+                if (isOpen) {
+                  isAutoClosingFaq = true;
+                  try {
+                    other.click();
+                  } finally {
+                    isAutoClosingFaq = false;
+                  }
+                }
+              });
+            });
+          },
+          true
+        );
       })();
     </script>
   </body>
