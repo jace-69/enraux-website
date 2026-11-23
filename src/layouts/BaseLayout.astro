@@ -619,10 +619,100 @@ const {
         background: rgba(128, 128, 134, 0.46) !important;
       }
 
-      /* Immediate Hero LCP CSS */
+      /* Immediate Cold-Load Hero CSS (0ms pure CSS animation, instant LCP, zero Framer CDN delay, zero CLS) */
       .framer-208ybr .framer-18b7vvs {
         opacity: 1 !important;
         transform: none !important;
+      }
+
+      @keyframes enrauxHeroRise {
+        0% {
+          opacity: 0.001;
+          transform: translate3d(0, 48px, 0);
+        }
+        100% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+      }
+
+      html.enraux-hero-play .framer-208ybr .framer-21z1vs {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both !important;
+      }
+
+      html.enraux-hero-play .framer-208ybr .framer-16y13cd-container,
+      html.enraux-hero-play .framer-208ybr .framer-wvinzv-container {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both !important;
+      }
+
+      /* Staggered letter-by-letter rise for ENRAUX */
+      html.enraux-hero-play .framer-208ybr .framer-1e663qr h1 > span > span:nth-child(1) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.02s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-1e663qr h1 > span > span:nth-child(2) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-1e663qr h1 > span > span:nth-child(3) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-1e663qr h1 > span > span:nth-child(4) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-1e663qr h1 > span > span:nth-child(5) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-1e663qr h1 > span > span:nth-child(6) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both !important;
+      }
+
+      /* Staggered letter-by-letter rise for STUDIO & ENGINE */
+      html.enraux-hero-play .framer-208ybr .framer-qsj2t3 p > span > span:nth-child(1),
+      html.enraux-hero-play .framer-208ybr .framer-g5dzqe p > span > span:nth-child(1) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-qsj2t3 p > span > span:nth-child(2),
+      html.enraux-hero-play .framer-208ybr .framer-g5dzqe p > span > span:nth-child(2) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-qsj2t3 p > span > span:nth-child(3),
+      html.enraux-hero-play .framer-208ybr .framer-g5dzqe p > span > span:nth-child(3) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-qsj2t3 p > span > span:nth-child(4),
+      html.enraux-hero-play .framer-208ybr .framer-g5dzqe p > span > span:nth-child(4) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.20s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-qsj2t3 p > span > span:nth-child(5),
+      html.enraux-hero-play .framer-208ybr .framer-g5dzqe p > span > span:nth-child(5) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both !important;
+      }
+      html.enraux-hero-play .framer-208ybr .framer-qsj2t3 p > span > span:nth-child(6),
+      html.enraux-hero-play .framer-208ybr .framer-g5dzqe p > span > span:nth-child(6) {
+        animation: enrauxHeroRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both !important;
+      }
+
+      html.enraux-hero-done .framer-208ybr .framer-21z1vs,
+      html.enraux-hero-done .framer-208ybr .framer-16y13cd-container,
+      html.enraux-hero-done .framer-208ybr .framer-wvinzv-container,
+      html.enraux-hero-done .framer-208ybr .framer-1e663qr h1 > span > span,
+      html.enraux-hero-done .framer-208ybr .framer-qsj2t3 p > span > span,
+      html.enraux-hero-done .framer-208ybr .framer-g5dzqe p > span > span {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .framer-208ybr .framer-21z1vs,
+        .framer-208ybr .framer-16y13cd-container,
+        .framer-208ybr .framer-wvinzv-container,
+        .framer-208ybr .framer-1e663qr h1 > span > span,
+        .framer-208ybr .framer-qsj2t3 p > span > span,
+        .framer-208ybr .framer-g5dzqe p > span > span {
+          animation: none !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
       }
     </style>
 
@@ -3878,22 +3968,58 @@ const {
           });
         }
 
-        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+        function runPricingAndWork() {
           injectPricingMenuLink();
-          if (typeof window.__removeWorkAndCollapseGap === "function") {
-            window.__removeWorkAndCollapseGap();
-          }
-          window.addEventListener("load", () => {
-            injectPricingMenuLink();
-            if (typeof window.__removeWorkAndCollapseGap === "function") {
-              window.__removeWorkAndCollapseGap();
+          window.__removeWorkAndCollapseGap?.();
+          window.__setPricingButtonsRole?.();
+        }
+
+        function schedulePricingInjection() {
+          requestAnimationFrame(runPricingAndWork);
+          setTimeout(runPricingAndWork, 50);
+          setTimeout(runPricingAndWork, 150);
+          setTimeout(runPricingAndWork, 350);
+          setTimeout(runPricingAndWork, 650);
+          setTimeout(runPricingAndWork, 1000);
+        }
+
+        const observedNavbars = new WeakSet();
+        let navbarMutationPending = false;
+        const navbarObserver = new MutationObserver(() => {
+          if (navbarMutationPending) return;
+          navbarMutationPending = true;
+          requestAnimationFrame(() => {
+            navbarMutationPending = false;
+            runPricingAndWork();
+          });
+        });
+
+        function attachNavbarObservers() {
+          const targets = document.querySelectorAll(
+            "nav.framer-z10Ts, .framer-stbjvl-container, .framer-1kmos2s-container"
+          );
+          targets.forEach((el) => {
+            if (!observedNavbars.has(el)) {
+              observedNavbars.add(el);
+              navbarObserver.observe(el, {
+                childList: true,
+                subtree: true,
+              });
             }
           });
+        }
+
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+          attachNavbarObservers();
+          runPricingAndWork();
+
+          window.addEventListener("load", () => {
+            attachNavbarObservers();
+            runPricingAndWork();
+          });
           window.addEventListener("pageshow", () => {
-            injectPricingMenuLink();
-            if (typeof window.__removeWorkAndCollapseGap === "function") {
-              window.__removeWorkAndCollapseGap();
-            }
+            attachNavbarObservers();
+            runPricingAndWork();
           });
 
           let pricingNavPending = false;
@@ -3902,10 +4028,8 @@ const {
             pricingNavPending = true;
             requestAnimationFrame(() => {
               pricingNavPending = false;
-              injectPricingMenuLink();
-              if (typeof window.__setPricingButtonsRole === "function") {
-                window.__setPricingButtonsRole();
-              }
+              attachNavbarObservers();
+              runPricingAndWork();
             });
           });
           pricingNavObserver.observe(document.documentElement || document.body, {
@@ -3918,35 +4042,68 @@ const {
           }, 6000);
         });
 
-        window.addEventListener(
-          "click",
-          (e) => {
-            const trigger =
-              e.target &&
-              typeof e.target.closest === "function" &&
-              e.target.closest(".framer-r1ebey, .framer-qvIpE, .framer-1vfl530");
-            if (trigger) {
-              const runAll = () => {
-                injectPricingMenuLink();
-                if (typeof window.__removeWorkAndCollapseGap === "function") {
-                  window.__removeWorkAndCollapseGap();
-                }
-              };
-              requestAnimationFrame(runAll);
-              setTimeout(runAll, 50);
-              setTimeout(runAll, 150);
-              setTimeout(runAll, 300);
-              setTimeout(runAll, 600);
-            }
-          },
-          true
-        );
+        function onMenuTrigger(e) {
+          const targetEl = e.target && e.target.nodeType === 3 ? e.target.parentElement : e.target;
+          const trigger =
+            targetEl &&
+            typeof targetEl.closest === "function" &&
+            targetEl.closest(
+              ".framer-r1ebey, .framer-qvIpE, .framer-1vfl530, nav.framer-z10Ts, .framer-stbjvl-container, .framer-1kmos2s-container, [data-framer-name*='Menu' i]"
+            );
+          if (trigger) {
+            attachNavbarObservers();
+            schedulePricingInjection();
+          }
+        }
+
+        ["click", "pointerup", "touchend"].forEach((evt) => {
+          window.addEventListener(evt, onMenuTrigger, { capture: true, passive: true });
+        });
       })();
     </script>
 
     <!-- Hero Appear Animation Safety Fallback (Edge WAAPI / dropped animation guard) -->
     <script is:inline>
       (function() {
+        if (!window.__enrauxHeroAnimatePatched && Element.prototype && typeof Element.prototype.animate === "function") {
+          window.__enrauxHeroAnimatePatched = true;
+          const origAnimate = Element.prototype.animate;
+          function isHeroEntranceNode(el) {
+            return !!(
+              el &&
+              el.nodeType === 1 &&
+              el.closest &&
+              el.closest(".framer-208ybr") &&
+              ((el.matches && el.matches(".framer-21z1vs, .framer-16y13cd-container, .framer-wvinzv-container, .framer-18b7vvs, [data-framer-appear-id]")) ||
+                (el.tagName === "SPAN" && !!el.closest(".framer-1e663qr, .framer-qsj2t3, .framer-g5dzqe")))
+            );
+          }
+          Element.prototype.animate = function(keyframes, options) {
+            if (isHeroEntranceNode(this)) {
+              return origAnimate.call(this, [], { duration: 0 });
+            }
+            return origAnimate.apply(this, arguments);
+          };
+        }
+
+        function cancelFramerHeroWaapi() {
+          const targets = document.querySelectorAll(
+            ".framer-208ybr [data-framer-appear-id], .framer-208ybr .framer-1e663qr span, .framer-208ybr .framer-qsj2t3 span, .framer-208ybr .framer-g5dzqe span"
+          );
+          for (let i = 0; i < targets.length; i++) {
+            const el = targets[i];
+            if (typeof el.getAnimations === "function") {
+              const anims = el.getAnimations();
+              for (let j = 0; j < anims.length; j++) {
+                const anim = anims[j];
+                if (!anim.animationName && typeof anim.cancel === "function") {
+                  anim.cancel();
+                }
+              }
+            }
+          }
+        }
+
         function checkHeroAppearElements() {
           const appearElements = document.querySelectorAll(
             ".framer-208ybr [data-framer-appear-id], .framer-208ybr .framer-18b7vvs, .framer-208ybr .framer-21z1vs, .framer-208ybr .framer-16y13cd-container, .framer-208ybr .framer-wvinzv-container"
@@ -3968,16 +4125,55 @@ const {
           }
         }
 
-        function scheduleHeroCheck() {
-          setTimeout(checkHeroAppearElements, 850);
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+          cancelFramerHeroWaapi();
+        });
+
+        let heroStarted = false;
+        function startHeroEntranceOnce() {
+          if (heroStarted) return;
+          heroStarted = true;
+
+          if (!document.querySelector(".framer-208ybr")) return;
+
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            document.documentElement.classList.add("enraux-hero-done");
+            return;
+          }
+
+          const fontPromise = (document.fonts && document.fonts.ready)
+            ? document.fonts.ready.catch(() => {})
+            : Promise.resolve();
+          const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 220));
+
+          Promise.race([fontPromise, timeoutPromise]).then(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                document.documentElement.classList.add("enraux-hero-play");
+                setTimeout(() => {
+                  document.documentElement.classList.remove("enraux-hero-play");
+                  document.documentElement.classList.add("enraux-hero-done");
+                  cancelFramerHeroWaapi();
+                  checkHeroAppearElements();
+                }, 880);
+              });
+            });
+          });
         }
 
         if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", scheduleHeroCheck);
+          document.addEventListener("DOMContentLoaded", startHeroEntranceOnce);
         } else {
-          scheduleHeroCheck();
+          startHeroEntranceOnce();
         }
-        window.addEventListener("load", scheduleHeroCheck);
+
+        setTimeout(() => {
+          const html = document.documentElement;
+          if (!html.classList.contains("enraux-hero-play") && !html.classList.contains("enraux-hero-done")) {
+            html.classList.add("enraux-hero-done");
+            checkHeroAppearElements();
+          }
+        }, 1500);
       })();
     </script>
 

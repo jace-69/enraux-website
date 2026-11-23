@@ -260,3 +260,18 @@ html body { background: var(--token-9240b7bb-edf3-458d-81ba-42a8e50097ee, rgb(25
     --framer-line-height: 1.4em !important;
     overflow: visible !important;
   }
+
+
+/* Center Hero Service Tags Row (.framer-21z1vs) halfway between Navbar and ENRAUX across all viewports */
+.framer-jWZoB .framer-208ybr {
+  padding-top: 88px !important;
+}
+@media (max-width: 1439.98px) {
+  .framer-jWZoB .framer-208ybr {
+    padding-top: 64px !important;
+  }
+}
+.framer-jWZoB .framer-21z1vs {
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+}
