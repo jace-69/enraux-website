@@ -3210,6 +3210,13 @@ const {
               if (node.nodeValue && node.nodeValue.includes("Forma Studio")) {
                 node.nodeValue = "© 2026 Enraux. All Rights Reserved.";
               }
+              if (node.nodeValue && /\(5 Services\)/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/\(5 Services\)/gi, "(4 Services)");
+              }
+              if (node.nodeValue && /Terms\s*&\s*Condition\b/i.test(node.nodeValue)) {
+                node.nodeValue = node.nodeValue.replace(/Terms\s*&\s*Condition\b/gi, "Terms & Conditions");
+              }
+
               if (node.nodeValue && /3D Identity/i.test(node.nodeValue)) {
                 node.nodeValue = node.nodeValue.replace(/3D Identity/gi, "Visual Identity");
               }
@@ -3830,7 +3837,7 @@ const {
             '  <div class="enraux-drawer-footer-inner">',
             '    <span>&copy; 2026 Enraux. All Rights Reserved.</span>',
             '    <div class="enraux-drawer-legal">',
-            '      <a href="/terms">Terms &amp; Condition</a>',
+            '      <a href="/terms">Terms &amp; Conditions</a>',
             '      <span>&bull;</span>',
             '      <a href="/privacy">Privacy Policy</a>',
             '    </div>',
