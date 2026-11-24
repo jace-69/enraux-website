@@ -4536,5 +4536,70 @@ const {
         );
       })();
     </script>
+
+    <!-- Stat Counter Lock Guard (Zero overhead on non-stat pages, instant snap before browser paint) -->
+    <script is:inline>
+      (() => {
+        if (!document.querySelector(".framer-1fw7774-container")) return;
+
+        const cfgs = [
+          { sel: ".framer-1h98ra0-container", num: "33", suffix: "+" },
+          { sel: ".framer-1ahemjk-container", num: "7", suffix: " Days" },
+          { sel: ".framer-1ebpkac-container", num: "200", suffix: "" },
+          { sel: ".framer-x8h656-container", num: "24", suffix: "/7" }
+        ];
+
+        let syncing = false;
+        function syncCard(card, cfg) {
+          if (syncing) return;
+          const container = card.querySelector(".framer-1fw7774-container");
+          if (!container) return;
+          const flexDiv = container.querySelector("div");
+          if (!flexDiv) return;
+          const spans = flexDiv.querySelectorAll("span");
+          if (spans.length < 3) return;
+
+          syncing = true;
+          try {
+            if (spans[1].textContent !== cfg.num) {
+              spans[1].textContent = cfg.num;
+            }
+            if (spans[2].textContent !== cfg.suffix) {
+              spans[2].textContent = cfg.suffix;
+            }
+          } finally {
+            syncing = false;
+          }
+        }
+
+        function initObservers() {
+          cfgs.forEach((cfg) => {
+            const cards = document.querySelectorAll(cfg.sel);
+            cards.forEach((card) => {
+              const counterEl = card.querySelector(".framer-1fw7774-container");
+              if (!counterEl) return;
+              const observer = new MutationObserver(() => {
+                syncCard(card, cfg);
+              });
+              observer.observe(counterEl, { childList: true, characterData: true, subtree: true });
+            });
+          });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initObservers);
+        } else {
+          initObservers();
+        }
+
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(() => {
+          cfgs.forEach((cfg) => {
+            document.querySelectorAll(cfg.sel).forEach((card) => {
+              syncCard(card, cfg);
+            });
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
