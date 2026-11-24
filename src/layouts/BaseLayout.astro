@@ -914,17 +914,25 @@ const {
 
           // 5. Canonical Blog Slug Mapping & Normalization
           const blogSlugMap = {
-            "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "blog-homepage-traffic",
-            "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "blog-creative-fatigue",
-            "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "blog-conversion-architecture",
-            "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "blog-page-speed",
-            "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "blog-video-ads",
-            "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "blog-video-ads",
-            "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "blog-ecommerce-cro",
-            "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "blog-ecommerce-cro",
-            "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "blog-visual-identity",
-            "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "blog-visual-identity",
-            "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "blog-unified-growth"
+            "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "homepage-traffic",
+            "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "creative-fatigue",
+            "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "conversion-architecture",
+            "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "page-speed",
+            "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "video-ads",
+            "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "video-ads",
+            "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "ecommerce-cro",
+            "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "ecommerce-cro",
+            "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "visual-identity",
+            "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "visual-identity",
+            "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "unified-growth",
+            "blog-homepage-traffic": "homepage-traffic",
+            "blog-creative-fatigue": "creative-fatigue",
+            "blog-conversion-architecture": "conversion-architecture",
+            "blog-page-speed": "page-speed",
+            "blog-video-ads": "video-ads",
+            "blog-ecommerce-cro": "ecommerce-cro",
+            "blog-visual-identity": "visual-identity",
+            "blog-unified-growth": "unified-growth"
           };
 
           const noLeadingSlash = h.replace(/^\/+/, "");
@@ -1238,12 +1246,12 @@ const {
           true
         );
 
-        document.addEventListener(
+        window.addEventListener(
           "click",
           (e) => {
             if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-            const a = e.target.closest("a");
+            const targetEl = e.target && e.target.nodeType === 3 ? e.target.parentElement : e.target;
+            const a = targetEl && typeof targetEl.closest === "function" ? targetEl.closest("a") : null;
             if (!a) return;
 
             // Do not intercept Claim Your Sprint button
@@ -2835,26 +2843,35 @@ const {
         const cleanPath = rawPath.replace(/^\/blog\/?/, "").replace(/\/$/, "");
         const isBlog1 =
           cleanPath.includes("why-sending-paid-traffic") ||
+          cleanPath.includes("homepage-traffic") ||
           cleanPath.includes("blog-homepage-traffic");
 
         const playbookMap = {
           "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "(Playbook 01 // Conversion)",
+          "homepage-traffic": "(Playbook 01 // Conversion)",
           "blog-homepage-traffic": "(Playbook 01 // Conversion)",
+          "creative-fatigue": "(Playbook 02 // Paid Social)",
           "blog-creative-fatigue": "(Playbook 02 // Paid Social)",
           "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "(Playbook 02 // Paid Social)",
+          "conversion-architecture": "(Playbook 03 // Landing Pages)",
           "blog-conversion-architecture": "(Playbook 03 // Landing Pages)",
           "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "(Playbook 03 // Landing Pages)",
+          "page-speed": "(Playbook 04 // Engineering)",
           "blog-page-speed": "(Playbook 04 // Engineering)",
           "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "(Playbook 04 // Engineering)",
+          "video-ads": "(Playbook 05 // Video Ads)",
           "blog-video-ads": "(Playbook 05 // Video Ads)",
           "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "(Playbook 05 // Video Ads)",
           "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "(Playbook 05 // Video Ads)",
+          "ecommerce-cro": "(Playbook 06 // E-Commerce CRO)",
           "blog-ecommerce-cro": "(Playbook 06 // E-Commerce CRO)",
           "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "(Playbook 06 // E-Commerce CRO)",
           "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "(Playbook 06 // E-Commerce CRO)",
+          "visual-identity": "(Playbook 07 // Brand Identity)",
           "blog-visual-identity": "(Playbook 07 // Brand Identity)",
           "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "(Playbook 07 // Brand Identity)",
           "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "(Playbook 07 // Brand Identity)",
+          "unified-growth": "(Playbook 08 // Unified Growth)",
           "blog-unified-growth": "(Playbook 08 // Unified Growth)",
           "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "(Playbook 08 // Unified Growth)"
         };
@@ -3009,18 +3026,26 @@ const {
             h = h.replace(/^(\/?blog)\/(blog\/)+/i, "$1/");
 
             const blogSlugMap = {
-              "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "blog-homepage-traffic",
-              "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "blog-creative-fatigue",
-              "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "blog-conversion-architecture",
-              "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "blog-page-speed",
-              "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "blog-video-ads",
-              "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "blog-video-ads",
-              "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "blog-ecommerce-cro",
-              "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "blog-ecommerce-cro",
-              "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "blog-visual-identity",
-              "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "blog-visual-identity",
-              "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "blog-unified-growth"
-            };
+            "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "homepage-traffic",
+            "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "creative-fatigue",
+            "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "conversion-architecture",
+            "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "page-speed",
+            "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "video-ads",
+            "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "video-ads",
+            "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "ecommerce-cro",
+            "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "ecommerce-cro",
+            "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "visual-identity",
+            "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "visual-identity",
+            "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "unified-growth",
+            "blog-homepage-traffic": "homepage-traffic",
+            "blog-creative-fatigue": "creative-fatigue",
+            "blog-conversion-architecture": "conversion-architecture",
+            "blog-page-speed": "page-speed",
+            "blog-video-ads": "video-ads",
+            "blog-ecommerce-cro": "ecommerce-cro",
+            "blog-visual-identity": "visual-identity",
+            "blog-unified-growth": "unified-growth"
+          };
 
             const noLeadingSlash = h.replace(/^\/+/, "");
             const slugCandidate = noLeadingSlash.replace(/^blog\//i, "").replace(/\/$/, "");
@@ -4599,6 +4624,93 @@ const {
             });
           });
         });
+      })();
+    </script>
+    <!-- Accessibility, Title & SSR Responsive Footer Guards -->
+    <script is:inline>
+      (() => {
+        // 1. Title Guard: capture static title immediately
+        const __enrauxPageTitle = document.title;
+        const syncTitle = () => {
+          if (__enrauxPageTitle && document.title !== __enrauxPageTitle) {
+            document.title = __enrauxPageTitle;
+          }
+        };
+
+        // 2. Duplicate CTA Label Guard
+        const syncCtaAriaHidden = () => {
+          document.querySelectorAll(".framer-undfj9, .framer-bsippn").forEach((el) => {
+            if (el.getAttribute("aria-hidden") !== "true") {
+              el.setAttribute("aria-hidden", "true");
+            }
+          });
+        };
+
+        // 3. Split-Text Word Guard (e.g., "S a a S" on /service)
+        const syncSplitText = () => {
+          const mainEl = document.getElementById("main");
+          if (!mainEl) return;
+          const candidateParents = mainEl.querySelectorAll('span[style*="white-space:nowrap"]');
+          candidateParents.forEach((parent) => {
+            const children = Array.from(parent.children);
+            if (children.length >= 2 && children.every((child) => child.tagName === "SPAN")) {
+              const chars = children.map((c) => c.textContent.trim());
+              if (chars.every((c) => c.length === 1)) {
+                const word = chars.join("");
+                if (/^[a-zA-Z0-9]+$/.test(word)) {
+                  parent.setAttribute("aria-label", word);
+                  children.forEach((c) => c.setAttribute("aria-hidden", "true"));
+                }
+              }
+            }
+          });
+        };
+
+        // Hydration & Load triggers
+        const onHydrated = () => {
+          syncTitle();
+          syncCtaAriaHidden();
+          syncSplitText();
+        };
+
+        (window.__enrauxWhenHydrated || ((fn) => fn()))(onHydrated);
+        window.addEventListener("load", syncTitle);
+
+        const titleEl = document.querySelector("title");
+        if (titleEl) {
+          const titleObserver = new MutationObserver(syncTitle);
+          titleObserver.observe(titleEl, { childList: true, characterData: true, subtree: true });
+        }
+
+        // 4. Static Blog Responsive Footer Guard: ONLY on static pages without Framer's script_main
+        if (!document.querySelector('script[data-framer-bundle="main"]')) {
+          const syncBlogFooters = () => {
+            const footers = document.querySelectorAll(".framer-gUICt");
+            footers.forEach((footer) => {
+              const variant = footer.closest(".ssr-variant");
+              if (variant) {
+                const isHidden = window.getComputedStyle(variant).display === "none";
+                if (isHidden) {
+                  variant.setAttribute("aria-hidden", "true");
+                } else {
+                  variant.removeAttribute("aria-hidden");
+                }
+              }
+            });
+          };
+
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", syncBlogFooters, { once: true });
+          } else {
+            syncBlogFooters();
+          }
+
+          let resizeTimer;
+          window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(syncBlogFooters, 100);
+          });
+        }
       })();
     </script>
   </body>

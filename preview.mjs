@@ -45,32 +45,40 @@ function loadEnvFile() {
 // Canonical Blog Slug Mapping (maps old long slugs, CMS slugs, and short slugs to strictly the 8 canonical files)
 const blogAliases = {
   // Post 1
-  "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "blog-homepage-traffic",
-  "blog-homepage-traffic": "blog-homepage-traffic",
+  "why-sending-paid-traffic-to-your-homepage-is-burning-half-your-ad-spend": "homepage-traffic",
+  "blog-homepage-traffic": "homepage-traffic",
+  "homepage-traffic": "homepage-traffic",
   // Post 2
-  "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "blog-creative-fatigue",
-  "blog-creative-fatigue": "blog-creative-fatigue",
+  "creative-fatigue-is-killing-your-roas-why-modern-brands-need-30-ads-a-month": "creative-fatigue",
+  "blog-creative-fatigue": "creative-fatigue",
+  "creative-fatigue": "creative-fatigue",
   // Post 3
-  "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "blog-conversion-architecture",
-  "blog-conversion-architecture": "blog-conversion-architecture",
+  "the-7-day-conversion-architecture-anatomy-of-a-page-that-closes-cold-clicks": "conversion-architecture",
+  "blog-conversion-architecture": "conversion-architecture",
+  "conversion-architecture": "conversion-architecture",
   // Post 4
-  "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "blog-page-speed",
-  "blog-page-speed": "blog-page-speed",
+  "every-extra-second-of-load-time-costs-you-20-of-your-paid-conversions": "page-speed",
+  "blog-page-speed": "page-speed",
+  "page-speed": "page-speed",
   // Post 5
-  "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "blog-video-ads",
-  "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "blog-video-ads",
-  "blog-video-ads": "blog-video-ads",
+  "the-3-second-thumb-stopper-scripting-video-ads-that-survive-the-scroll": "video-ads",
+  "the-3-second-thumb-stopper-scripting-video-ads-that-hold-attention-and-sell": "video-ads",
+  "blog-video-ads": "video-ads",
+  "video-ads": "video-ads",
   // Post 6
-  "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "blog-ecommerce-cro",
-  "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "blog-ecommerce-cro",
-  "blog-ecommerce-cro": "blog-ecommerce-cro",
+  "fixing-the-leaky-storefront-5-checkout-frictions-costing-you-6-figures": "ecommerce-cro",
+  "fixing-the-leaky-storefront-5-checkout-frictions-costing-brands-six-figures": "ecommerce-cro",
+  "blog-ecommerce-cro": "ecommerce-cro",
+  "ecommerce-cro": "ecommerce-cro",
   // Post 7
-  "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "blog-visual-identity",
-  "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "blog-visual-identity",
-  "blog-visual-identity": "blog-visual-identity",
+  "how-category-leading-visual-identity-lowers-your-customer-acquisition-cost": "visual-identity",
+  "how-category-leading-visual-identity-lets-you-command-2x-higher-margins": "visual-identity",
+  "blog-visual-identity": "visual-identity",
+  "visual-identity": "visual-identity",
   // Post 8
-  "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "blog-unified-growth",
-  "blog-unified-growth": "blog-unified-growth",
+  "why-hiring-separate-ad-and-web-agencies-is-the-most-expensive-mistake-in-growth": "unified-growth",
+  "blog-unified-growth": "unified-growth",
+  "unified-growth": "unified-growth",
 };
 
 http.createServer(async (req, res) => {
